@@ -1,0 +1,5 @@
+.NET wrapper for WinPcap written in C++/CLI and C#, which features almost all WinPcap features and includes a packet interpretation framework.
+https://github.com/PcapDotNet/Pcap.Net
+
+Visual Studio Pcap analysis tutorial:
+https://www.youtube.com/watch?v=YpnrR7D_lRI
