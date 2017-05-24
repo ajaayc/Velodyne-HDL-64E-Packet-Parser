@@ -1,5 +1,9 @@
-/*Code obtained from:
+/*
+Code adapted from:
 www.rhyous.com/2011/11/13/how-to-read-a-pcap-file-from-wireshark-with-c
+
+Visual Studio Setup Video for pcap.h:
+www.youtube.com/watch?v=YpnrR7D_lRI
 */
 
 /* Demonstration program of reading packet trace files recorded by pcap
@@ -22,8 +26,7 @@ int main(int argc, char *argv[])
 	* Step 2 - Get a file name
 	*/
 
-	string file = "C:\\users\\jared\\testfiles\\smallcapture.pcap";
-
+	string file = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\calibration_5.24.17\\calibration_packets_shorter.pcap";
 	/*
 	* Step 3 - Create an char array to hold the error.
 	*/
