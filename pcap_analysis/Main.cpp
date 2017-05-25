@@ -15,10 +15,88 @@ www.youtube.com/watch?v=YpnrR7D_lRI
 * Step 1 - Add includes
 */
 #include <string>
-#include <iostream>
+//#include <iostream>
+#include <stdio.h>
 #include <pcap.h>
 
 using namespace std;
+
+class calibrationOutput{
+private:
+  FILE* calFile;
+  u_char gpsT[4];
+  u_char statusType;
+  u_char statusVal;
+  
+public:
+  calibrationOutput(string outFile){
+    calFile = fopen(outFile.c_str(), "w");
+	if (!calFile) {
+		printf("Failed to open %s.\n",outFile.c_str());
+		system("pause");
+		exit(1);
+	}
+
+    fprintf(calFile,"Calibration Packets\n");
+
+    fprintf(calFile,
+		"%s%s%s%s%s%s%s%s",
+	    "GPS Timestamp,",
+	    "Timestamp in us,",
+	    "Status Type,",
+	    "Status Type Decimal,",
+	    "Status Type ASCII,",
+	    "Status Value,",
+	    "Status Value Decimal,",
+	    "Status Value ASCII\n");
+  }
+
+  //Takes in a pointer to beginning of the packet. Requires
+  //that packptr points to memory allocated at 1248 bytes
+  void printCalibrationData(const u_char* packptr){
+	  //Prints last 6 Bytes to csv
+
+	  gpsT[0] = packptr[1245];
+	  gpsT[1] = packptr[1244];
+	  gpsT[2] = packptr[1243];
+	  gpsT[3] = packptr[1242];
+
+	  statusType = packptr[1246];
+	  statusVal = packptr[1247];
+
+	  //1. 4 Bytes for GPS Timestamp
+	  fprintf(calFile, "%.2x%.2x%.2x%.2x,", gpsT[0], gpsT[1], gpsT[2], gpsT[3]);
+
+	  //2. Convert Timestamp to us and print it
+	  u_int* gpsT_decimal = (u_int*)(gpsT);
+	  fprintf(calFile, "%d,", *gpsT_decimal);
+
+	  //3. Status Type in Hex
+	  fprintf(calFile, "%.2x,", statusType);
+
+	  //4. Status Type in Decimal
+	  fprintf(calFile, "%d,", statusType);
+
+	  //5. Status Type in ASCII
+	  fprintf(calFile, "%c,", statusType);
+
+	  //6. Status Value in Hex
+	  fprintf(calFile, "%.2x,", statusVal);
+
+	  //7. Status Value in Decimal
+	  fprintf(calFile, "%d,", statusVal);
+
+	  //8. Status Value in ASCII
+	  fprintf(calFile, "%c,", statusVal);
+
+	  fprintf(calFile, "%s", "\n");
+  }
+
+  ~calibrationOutput(){
+    fclose(calFile);
+  }
+};
+
 
 int main(int argc, char *argv[])
 {
@@ -45,7 +123,7 @@ int main(int argc, char *argv[])
 	pcap_t * pcap = pcap_open_offline(file.c_str(), errbuff);
 	
 	if (pcap == nullptr || pcap == 0) {
-		cerr << "Couldn't open pcap file." << endl;
+		printf("Couldn't open pcap file.\n");
 		printf("%.*s", PCAP_ERRBUF_SIZE, pcap);
 		exit(1);
 	}
@@ -74,6 +152,9 @@ int main(int argc, char *argv[])
 
 	int returnValue;
 
+	//Create calibration output file
+	calibrationOutput calO("calibration.csv");
+
 	while (returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
 	{
 		// Print using printf. See printf reference:
@@ -101,9 +182,14 @@ int main(int argc, char *argv[])
 
 			// Print each octet as hex (x), make sure there is always two characters (.2).
 			printf("%.2x ", data[i]);
+		}			
+		
+		if (header->caplen == 1248) {
+			calO.printCalibrationData(data);
 		}
 
 		// Add two lines between packets
 		printf("\n\n");
 	}
+
 }
