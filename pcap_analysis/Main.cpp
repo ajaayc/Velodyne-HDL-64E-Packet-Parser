@@ -27,15 +27,17 @@ private:
   u_char gpsT[4];
   u_char statusType;
   u_char statusVal;
-  
+  bool calibration_only;
+
 public:
-  calibrationOutput(string outFile){
+  calibrationOutput(string outFile,bool calibration_only_ = false){
     calFile = fopen(outFile.c_str(), "w");
 	if (!calFile) {
 		printf("Failed to open %s.\n",outFile.c_str());
 		system("pause");
 		exit(1);
 	}
+	calibration_only = calibration_only_;
 
     fprintf(calFile,"Calibration Packets\n");
 
@@ -64,32 +66,35 @@ public:
 	  statusType = packptr[1246];
 	  statusVal = packptr[1247];
 
-	  //1. 4 Bytes for GPS Timestamp
-	  fprintf(calFile, "%.2x%.2x%.2x%.2x,", gpsT[0], gpsT[1], gpsT[2], gpsT[3]);
+	  if (!calibration_only || (calibration_only && '1' <= statusType && statusType <= '7')){
 
-	  //2. Convert Timestamp to us and print it
-	  u_int* gpsT_decimal = (u_int*)(gpsT);
-	  fprintf(calFile, "%d,", *gpsT_decimal);
+		  //1. 4 Bytes for GPS Timestamp
+		  fprintf(calFile, "%.2x%.2x%.2x%.2x,", gpsT[0], gpsT[1], gpsT[2], gpsT[3]);
 
-	  //3. Status Type in Hex
-	  fprintf(calFile, "%.2x,", statusType);
+		  //2. Convert Timestamp to us and print it
+		  u_int* gpsT_decimal = (u_int*)(gpsT);
+		  fprintf(calFile, "%d,", *gpsT_decimal);
 
-	  //4. Status Type in Decimal
-	  fprintf(calFile, "%d,", statusType);
+		  //3. Status Type in Hex
+		  fprintf(calFile, "%.2x,", statusType);
 
-	  //5. Status Type in ASCII
-	  fprintf(calFile, "%c,", statusType);
+		  //4. Status Type in Decimal
+		  fprintf(calFile, "%d,", statusType);
 
-	  //6. Status Value in Hex
-	  fprintf(calFile, "%.2x,", statusVal);
+		  //5. Status Type in ASCII
+		  fprintf(calFile, "%c,", statusType);
 
-	  //7. Status Value in Decimal
-	  fprintf(calFile, "%d,", statusVal);
+		  //6. Status Value in Hex
+		  fprintf(calFile, "%.2x,", statusVal);
 
-	  //8. Status Value in ASCII
-	  fprintf(calFile, "%c,", statusVal);
+		  //7. Status Value in Decimal
+		  fprintf(calFile, "%d,", statusVal);
 
-	  fprintf(calFile, "%s", "\n");
+		  //8. Status Value in ASCII
+		  fprintf(calFile, "%c,", statusVal);
+
+		  fprintf(calFile, "%s", "\n");
+	  }
   }
 
   ~calibrationOutput(){
@@ -152,14 +157,18 @@ int main(int argc, char *argv[])
 
 	int returnValue;
 
-	//Create calibration output file
-	calibrationOutput calO("calibration.csv");
+	//Create calibration output file. This is for all data
+	calibrationOutput cal_all("calibration_all.csv",false);
+
+	//Create calibration output file. This is for only the 7 bytes
+	calibrationOutput cal_calib("calibration_only.csv", true);
 
 	while (returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
 	{
 		// Print using printf. See printf reference:
 		// http://www.cplusplus.com/reference/clibrary/cstdio/printf/
 
+		/*
 		// Show the packet number
 		printf("Packet # %i\n", ++packetCount);
 
@@ -167,9 +176,9 @@ int main(int argc, char *argv[])
 		printf("Packet size: %d bytes\n", header->len);
 
 		// Show a warning if the length captured is different
-		if (header->len != header->caplen)
+		if (header->len != header->caplen){
 			printf("Warning! Capture size different than packet size: %ld bytes\n", header->len);
-
+		}
 		// Show Epoch Time
 		printf("Epoch Time: %d:%d seconds\n", header->ts.tv_sec, header->ts.tv_usec);
 
@@ -183,9 +192,11 @@ int main(int argc, char *argv[])
 			// Print each octet as hex (x), make sure there is always two characters (.2).
 			printf("%.2x ", data[i]);
 		}			
-		
+		*/
+
 		if (header->caplen == 1248) {
-			calO.printCalibrationData(data);
+			cal_all.printCalibrationData(data);
+			cal_calib.printCalibrationData(data);
 		}
 
 		// Add two lines between packets
