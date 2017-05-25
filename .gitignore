@@ -1,3 +1,6 @@
 Release
 Debug
 *~
+pcap_analysis/Release
+pcap_analysis/Debug
+*.csv
