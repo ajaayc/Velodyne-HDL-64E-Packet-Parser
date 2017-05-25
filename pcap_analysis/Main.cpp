@@ -43,6 +43,12 @@ int main(int argc, char *argv[])
 	// Use pcap_open_offline
 	// http://www.winpcap.org/docs/docs_41b5/html/group__wpcapfunc.html#g91078168a13de8848df2b7b83d1f5b69
 	pcap_t * pcap = pcap_open_offline(file.c_str(), errbuff);
+	
+	if (pcap == nullptr || pcap == 0) {
+		cerr << "Couldn't open pcap file." << endl;
+		printf("%.*s", PCAP_ERRBUF_SIZE, pcap);
+		exit(1);
+	}
 
 	/*
 	* Step 5 - Create a header and a data object
@@ -62,7 +68,13 @@ int main(int argc, char *argv[])
 	* Step 6 - Loop through packets and print them to screen
 	*/
 	u_int packetCount = 0;
-	while (int returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
+
+	//pcap_next_ex changes the header and data pointer to point to a different location
+	//The pointer is mutable but the pointed-to data is immutable
+
+	int returnValue;
+
+	while (returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
 	{
 		// Print using printf. See printf reference:
 		// http://www.cplusplus.com/reference/clibrary/cstdio/printf/
