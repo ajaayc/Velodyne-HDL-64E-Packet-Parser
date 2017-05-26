@@ -15,7 +15,8 @@ www.youtube.com/watch?v=YpnrR7D_lRI
 * Step 1 - Add includes
 */
 #include <string>
-//#include <iostream>
+#include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <pcap.h>
 
@@ -58,22 +59,26 @@ public:
   void printCalibrationData(const u_char* packptr){
 	  //Prints last 6 Bytes to csv
 
-	  gpsT[0] = packptr[1245];
-	  gpsT[1] = packptr[1244];
-	  gpsT[2] = packptr[1243];
-	  gpsT[3] = packptr[1242];
+	  gpsT[0] = packptr[1242];
+	  gpsT[1] = packptr[1243];
+	  gpsT[2] = packptr[1244];
+	  gpsT[3] = packptr[1245];
 
 	  statusType = packptr[1246];
 	  statusVal = packptr[1247];
 
+	  int i = 0;
+
 	  if (!calibration_only || (calibration_only && '1' <= statusType && statusType <= '7')){
 
-		  //1. 4 Bytes for GPS Timestamp
-		  fprintf(calFile, "%.2x%.2x%.2x%.2x,", gpsT[0], gpsT[1], gpsT[2], gpsT[3]);
+		  //1. 4 Bytes for GPS Timestamp. Have to follow manual and reverse packets
+		  fprintf(calFile, "%.2x%.2x%.2x%.2x,", gpsT[3], gpsT[2], gpsT[1], gpsT[0]);
 
-		  //2. Convert Timestamp to us and print it
+		  //2. Convert Timestamp to us and print it. This works without reversing the bytes because
+		  //computer is little endian
 		  u_int* gpsT_decimal = (u_int*)(gpsT);
-		  fprintf(calFile, "%d,", *gpsT_decimal);
+
+		  fprintf(calFile, "%u,", *gpsT_decimal);
 
 		  //3. Status Type in Hex
 		  fprintf(calFile, "%.2x,", statusType);
@@ -192,6 +197,9 @@ int main(int argc, char *argv[])
 			// Print each octet as hex (x), make sure there is always two characters (.2).
 			printf("%.2x ", data[i]);
 		}			
+
+		// Add two lines between packets
+		printf("\n\n");
 		*/
 
 		if (header->caplen == 1248) {
@@ -199,8 +207,6 @@ int main(int argc, char *argv[])
 			cal_calib.printCalibrationData(data);
 		}
 
-		// Add two lines between packets
-		printf("\n\n");
 	}
 
 }
