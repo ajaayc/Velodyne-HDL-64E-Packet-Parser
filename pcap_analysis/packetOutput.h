@@ -1,3 +1,6 @@
+#ifndef _PACKET_OUTPUT_H_
+#define _PACKET_OUTPUT_H_
+
 #include <pcap.h>
 #include <string>
 
@@ -19,10 +22,11 @@ public:
 
 	//Takes in a pointer to beginning of the packet. Requires
 	//that packptr points to memory allocated at 1248 bytes
-	virtual void printCalibrationData(const u_char* packptr) = 0;
+	//virtual void printCalibrationData(const lidarPacket& pack) = 0;
 
 	~packetOutput(){
 		fclose(pktFile);
 	}
 
 };
+#endif

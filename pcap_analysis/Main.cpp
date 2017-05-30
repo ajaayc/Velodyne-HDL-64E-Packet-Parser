@@ -19,8 +19,10 @@ www.youtube.com/watch?v=YpnrR7D_lRI
 #include <fstream>
 #include <stdio.h>
 #include <pcap.h>
-#include "calibrationOutput.h"
+#include "calibrationRowOutput.h"
 #include "laserOutput.h"
+#include "calibrationTableOutput.h"
+#include "lidarPacket.h"
 
 using namespace std;
 
@@ -79,10 +81,10 @@ int main(int argc, char *argv[])
 	int returnValue;
 
 	//Create calibration output file. This is for all data
-	calibrationOutput cal_all("calibration_all.csv",false);
+	calibrationRowOutput cal_all("calibration_all.csv",false);
 
 	//Create calibration output file. This is for only the 7 bytes
-	calibrationOutput cal_calib("calibration_only.csv", true);
+	calibrationRowOutput cal_calib("calibration_only.csv", true);
 
 	//Create output file to show a packet
 
@@ -120,9 +122,11 @@ int main(int argc, char *argv[])
 		printf("\n\n");
 		*/
 
+		lidarPacket pack(data);
+
 		if (header->caplen == 1248) {
-			cal_all.printCalibrationData(data);
-			cal_calib.printCalibrationData(data);
+			cal_all.printCalibrationData(pack);
+			cal_calib.printCalibrationData(pack);
 		}
 
 	}

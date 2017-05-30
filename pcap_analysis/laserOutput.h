@@ -1,3 +1,6 @@
+#ifndef _LASER_OUTPUT_H_
+#define _LASER_OUTPUT_H_
+
 #include <pcap.h>
 #include "packetOutput.h"
 #include <string>
@@ -29,3 +32,4 @@ public:
 
 	~laserOutput(){}
 };
+#endif /*_LASER_OUTPUT_H_*/

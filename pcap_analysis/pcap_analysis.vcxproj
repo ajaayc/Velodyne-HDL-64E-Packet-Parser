@@ -85,9 +85,12 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="calibrationOutput.h" />
+    <ClInclude Include="calibrationRowOutput.h" />
+    <ClInclude Include="calibrationTableOutput.h" />
     <ClInclude Include="laserOutput.h" />
+    <ClInclude Include="lidarPacket.h" />
     <ClInclude Include="packetOutput.h" />
+    <ClInclude Include="definitions.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
