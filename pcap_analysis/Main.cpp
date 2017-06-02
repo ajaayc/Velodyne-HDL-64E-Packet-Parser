@@ -86,6 +86,8 @@ int main(int argc, char *argv[])
 	//Create calibration output file. This is for only the 7 bytes
 	calibrationRowOutput cal_calib("calibration_only.csv", true);
 
+	calibrationTableOutput table_calib("table.csv");
+
 	//Create output file to show a packet
 
 	while (returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
@@ -127,6 +129,7 @@ int main(int argc, char *argv[])
 		if (header->caplen == 1248) {
 			cal_all.printCalibrationData(pack);
 			cal_calib.printCalibrationData(pack);
+			table_calib.recordNewPacket(pack);
 		}
 
 	}

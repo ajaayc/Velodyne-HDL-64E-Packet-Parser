@@ -4,10 +4,15 @@
 #include "pcap.h"
 
 #define NUM_LASERS 64
-#define CYCLE_LENGTH 16
+#define PACKETS_PER_LASER CYCLE_LENGTH * CYCLES_PER_LASER
+#define CYCLE_LENGTH (MISC_DATA_LENGTH + CAL_DATA_LENGTH)
+#define MISC_DATA_LENGTH 9
+#define CAL_DATA_LENGTH 7
+#define CYCLES_PER_LASER 4
 
 //Calibration data for a laser
 struct laser_params {
+	u_char laser_num;
 	u_short vert_correction;
 	u_short rot_correction;
 	u_short far_dist_correction;
