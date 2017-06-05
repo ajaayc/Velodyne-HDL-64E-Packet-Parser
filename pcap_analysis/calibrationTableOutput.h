@@ -39,6 +39,8 @@ private:
 
 	bool finishedCalibration;
 
+	bool calibrationFail;
+
 private:
 	//Converts 2 consecutive bytes in currLaser array to a u_short.
 	//Takes in index of currLaser[] where bytes begin
@@ -65,6 +67,8 @@ public:
 		isFirstCycle = false;
 		currIndex = 0;
 		laserIndex = 0;
+		calibrationFail = false;
+
 		memset((void*)currLaser, 0, sizeof(l_status)* PACKETS_PER_LASER);
 
 		memset((void*)params, 0, sizeof(laser_params)* NUM_LASERS);
@@ -85,11 +89,20 @@ private:
 		currParam.dist_correction_x = bytes_to_short(getLaserIndex(0,0));
 		currParam.dist_correction_v = bytes_to_short(getLaserIndex(2,0));
 		currParam.vert_offset_correction = bytes_to_short(getLaserIndex(4,0));
+		
+		//Requires overloaded version
 		currParam.horiz_offset_correction = bytes_to_short(getLaserIndex(1,6), getLaserIndex(2,0));
+		
 		currParam.focal_dist = bytes_to_short(getLaserIndex(2, 1));
 		currParam.focal_slope = bytes_to_short(getLaserIndex(2, 3));
 		currParam.min_intensity = currLaser[getLaserIndex(2,5)].value;
 		currParam.max_intensity = currLaser[getLaserIndex(2,6)].value;
+
+		if (currParam.laser_num != (u_int)laserIndex){
+			calibrationFail = true;
+			fprintf(pktFile, "ERROR: Calibration data no longer aligned at laser index %d.\n", laserIndex);
+			fprintf(pktFile, "It's suggested that you try to calibrate with a different pcap file.\n");
+		}
 	}
 
 public:
@@ -98,7 +111,7 @@ public:
 	//to this function without skipping)
 	//Packptr won't be recorded if we already have calibration data
 	void recordNewPacket(const lidarPacket& packptr){
-		if (finishedCalibration){
+		if (finishedCalibration || calibrationFail){
 			return;
 		}
 

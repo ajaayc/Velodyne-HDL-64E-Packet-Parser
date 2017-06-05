@@ -9,6 +9,8 @@
 #define MISC_DATA_LENGTH 9
 #define CAL_DATA_LENGTH 7
 #define CYCLES_PER_LASER 4
+#define PACKET_SIZE 1248
+
 
 //Calibration data for a laser
 struct laser_params {

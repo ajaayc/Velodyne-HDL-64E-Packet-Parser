@@ -32,7 +32,15 @@ int main(int argc, char *argv[])
 	* Step 2 - Get a file name
 	*/
 
-	string file = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\calibration_5.24.17\\calibration_packets_shorter.pcap";
+	//This file has calibration data until Laser 37
+	//string file = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\calibration_5.24.17\\calibration_packets_shorter.pcap";
+
+	//This file has calibration data until Laser 58. Missing Lasers 59 through 64
+	//string file = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\calibration_5.24.17\\calibration_packets.pcap";
+
+	//This file has calibration data for all 64 lasers
+	string file = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\veloview_parkinglot_recordings_5.23.17\\parking_lot_2.pcap";
+
 	/*
 	* Step 3 - Create an char array to hold the error.
 	*/
@@ -126,7 +134,7 @@ int main(int argc, char *argv[])
 
 		lidarPacket pack(data);
 
-		if (header->caplen == 1248) {
+		if (header->caplen == PACKET_SIZE) {
 			cal_all.printCalibrationData(pack);
 			cal_calib.printCalibrationData(pack);
 			table_calib.recordNewPacket(pack);
