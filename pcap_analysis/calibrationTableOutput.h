@@ -43,15 +43,21 @@ private:
 	//Converts 2 consecutive bytes in currLaser array to a u_short.
 	//Takes in index of currLaser[] where bytes begin
 	u_short bytes_to_short(int index){
+		return bytes_to_short(index,index+1);
+	}
+
+	//Overloaded. Can use bytes at different indexes
+	u_short bytes_to_short(int index1, int index2){
 		u_char bytes[sizeof(short)];
 		u_short s;
 
-		bytes[0] = 	currLaser[index].value;
-		bytes[1] = currLaser[index + 1].value;
+		bytes[0] = currLaser[index1].value;
+		bytes[1] = currLaser[index2].value;
 
 		memcpy(&s, bytes, sizeof(short));
 		return s;
 	}
+
 public:
 	calibrationTableOutput(string outFile) : packetOutput(outFile){
 		detectedUNIT = false;
@@ -59,7 +65,7 @@ public:
 		isFirstCycle = false;
 		currIndex = 0;
 		laserIndex = 0;
-		memset((void*)currLaser, 0, sizeof(l_status)* CYCLE_LENGTH);
+		memset((void*)currLaser, 0, sizeof(l_status)* PACKETS_PER_LASER);
 
 		memset((void*)params, 0, sizeof(laser_params)* NUM_LASERS);
 	}
@@ -79,9 +85,11 @@ private:
 		currParam.dist_correction_x = bytes_to_short(getLaserIndex(0,0));
 		currParam.dist_correction_v = bytes_to_short(getLaserIndex(2,0));
 		currParam.vert_offset_correction = bytes_to_short(getLaserIndex(4,0));
-		//currParam.horiz_offset_correction = 0;
+		currParam.horiz_offset_correction = bytes_to_short(getLaserIndex(1,6), getLaserIndex(2,0));
 		currParam.focal_dist = bytes_to_short(getLaserIndex(2, 1));
 		currParam.focal_slope = bytes_to_short(getLaserIndex(2, 3));
+		currParam.min_intensity = currLaser[getLaserIndex(2,5)].value;
+		currParam.max_intensity = currLaser[getLaserIndex(2,6)].value;
 	}
 
 public:
@@ -98,7 +106,7 @@ public:
 			if (packptr.statusType == '1' && packptr.statusVal == 'U'){
 				detectedUNIT = true;
 				//Starts at different index after all of the H,M,S,D,M,Y,GPS,T,V data
-				currIndex = 8;
+				currIndex = MISC_DATA_LENGTH;
 
 				isFirstCycle = true;
 			}
@@ -116,7 +124,7 @@ public:
 			if (isFirstCycle && currIndex >= CYCLE_LENGTH){
 				//Extract threshold bytes
 				memcpy((void*)&this->threshold, (void*) (currLaser + 14), sizeof(this->threshold));
-
+				
 				isFirstCycle = false;
 				currIndex = 0;
 			}
