@@ -100,15 +100,15 @@ private:
 
 	void printLaserData(const laser_params& param){
 	  fprintf(pktFile,"laser_num: %d\n",param.laser_num);
-	  fprintf(pktFile,"vert_correction: %d\n",param.vert_correction);
-	  fprintf(pktFile,"rot_correction: %d\n", param.rot_correction);
-	  fprintf(pktFile,"far_dist_correction: %d\n",param.far_dist_correction);
-	  fprintf(pktFile,"dist_correction_x: %d\n",param.dist_correction_x);
-	  fprintf(pktFile,"dist_correction_v: %d\n",param.dist_correction_v);
-	  fprintf(pktFile,"vert_offset_correction: %d\n",param.vert_offset_correction);
-	  fprintf(pktFile,"horiz_offset_correction: %d\n",param.horiz_offset_correction);
-	  fprintf(pktFile, "focal_dist: %d\n", param.focal_dist);
-	  fprintf(pktFile,"focal_slope: %d\n", param.focal_slope);
+	  fprintf(pktFile,"vert_correction: %f\n",param.vert_correction/100.0);
+	  fprintf(pktFile,"rot_correction: %f\n", param.rot_correction/100.0);
+	  fprintf(pktFile,"far_dist_correction: %f\n",param.far_dist_correction/10.0);
+	  fprintf(pktFile, "dist_correction_x: %f\n", param.dist_correction_x/10.0);
+	  fprintf(pktFile, "dist_correction_v: %f\n", param.dist_correction_v/10.0);
+	  fprintf(pktFile, "vert_offset_correction: %f\n", param.vert_offset_correction/10.0);
+	  fprintf(pktFile, "horiz_offset_correction: %f\n", param.horiz_offset_correction/10.0);
+	  fprintf(pktFile, "focal_dist: %f\n", param.focal_dist/10.0);
+	  fprintf(pktFile, "focal_slope: %f\n", param.focal_slope/10.0);
 	  fprintf(pktFile,"min_intensity: %u\n",param.min_intensity);
 	  fprintf(pktFile,"max_intensity: %u\n",param.max_intensity);
 	  fprintf(pktFile,"\n");
@@ -122,9 +122,9 @@ private:
 		currParam.vert_correction = bytes_to_short(getLaserIndex(0,1));
 		currParam.rot_correction = bytes_to_short(getLaserIndex(0,3));
 		currParam.far_dist_correction = bytes_to_short(getLaserIndex(0,5));
-		currParam.dist_correction_x = bytes_to_short(getLaserIndex(0,0));
-		currParam.dist_correction_v = bytes_to_short(getLaserIndex(2,0));
-		currParam.vert_offset_correction = bytes_to_short(getLaserIndex(4,0));
+		currParam.dist_correction_x = bytes_to_short(getLaserIndex(1,0));
+		currParam.dist_correction_v = bytes_to_short(getLaserIndex(1,2));
+		currParam.vert_offset_correction = bytes_to_short(getLaserIndex(1,4));
 		
 		//Requires overloaded version
 		currParam.horiz_offset_correction = bytes_to_short(getLaserIndex(1,6), getLaserIndex(2,0));
