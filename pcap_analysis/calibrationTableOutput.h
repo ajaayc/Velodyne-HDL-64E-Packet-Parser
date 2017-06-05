@@ -42,17 +42,17 @@ private:
 	bool calibrationFail;
 
 private:
-	//Converts 2 consecutive bytes in currLaser array to a u_short.
+	//Converts 2 consecutive bytes in currLaser array to a signed short.
 	//Takes in index of currLaser[] where bytes begin
-	u_short bytes_to_short(int index){
+	short bytes_to_short(int index){
 		return bytes_to_short(index,index+1);
 	}
 
 	//Overloaded. Can use bytes at different indexes
-	u_short bytes_to_short(int index1, int index2){
+	short bytes_to_short(int index1, int index2){
 		u_char bytes[sizeof(short)];
-		u_short s;
-
+		short s;
+		
 		bytes[0] = currLaser[index1].value;
 		bytes[1] = currLaser[index2].value;
 
@@ -89,8 +89,8 @@ private:
 	  fprintf(pktFile,"horiz_offset_correction: %d\n",param.horiz_offset_correction);
 	  fprintf(pktFile,"focal_dist: %d\n",param.focal_dist);
 	  fprintf(pktFile,"focal_slope: %d\n",param.focal_slope);
-	  fprintf(pktFile,"min_intensity: %d\n",param.min_intensity);
-	  fprintf(pktFile,"max_intensity: %d\n",param.max_intensity);
+	  fprintf(pktFile,"min_intensity: %u\n",param.min_intensity);
+	  fprintf(pktFile,"max_intensity: %u\n",param.max_intensity);
 	  fprintf(pktFile,"\n");
 	}
 
