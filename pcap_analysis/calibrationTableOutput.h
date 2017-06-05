@@ -78,6 +78,22 @@ private:
 		return cycle_num * CYCLE_LENGTH + MISC_DATA_LENGTH + index;
 	}
 
+	void printLaserData(const laser_params& param){
+	  fprintf(pktFile,"laser_num: %d\n",param.laser_num);
+	  fprintf(pktFile,"vert_correction: %d\n",param.vert_correction);
+	  fprintf(pktFile,"rot_correction: %d\n",param.rot_correction);
+	  fprintf(pktFile,"far_dist_correction: %d\n",param.far_dist_correction);
+	  fprintf(pktFile,"dist_correction_x: %d\n",param.dist_correction_x);
+	  fprintf(pktFile,"dist_correction_v: %d\n",param.dist_correction_v);
+	  fprintf(pktFile,"vert_offset_correction: %d\n",param.vert_offset_correction);
+	  fprintf(pktFile,"horiz_offset_correction: %d\n",param.horiz_offset_correction);
+	  fprintf(pktFile,"focal_dist: %d\n",param.focal_dist);
+	  fprintf(pktFile,"focal_slope: %d\n",param.focal_slope);
+	  fprintf(pktFile,"min_intensity: %d\n",param.min_intensity);
+	  fprintf(pktFile,"max_intensity: %d\n",param.max_intensity);
+	  fprintf(pktFile,"\n");
+	}
+
 	//Puts values into laser_params[laserIndex] from currLaser
 	void parseLaserData(){
 		laser_params& currParam = params[laserIndex];
@@ -97,6 +113,8 @@ private:
 		currParam.focal_slope = bytes_to_short(getLaserIndex(2, 3));
 		currParam.min_intensity = currLaser[getLaserIndex(2,5)].value;
 		currParam.max_intensity = currLaser[getLaserIndex(2,6)].value;
+
+		printLaserData(currParam);
 
 		if (currParam.laser_num != (u_int)laserIndex){
 			calibrationFail = true;
