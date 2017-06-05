@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 	//Create calibration output file. This is for only the 7 bytes
 	calibrationRowOutput cal_calib("calibration_only.csv", true);
 
-	calibrationTableOutput table_calib("table.csv");
+	calibrationTableOutput table_calib("calibration_table.csv");
 
 	//Create output file to show a packet
 
