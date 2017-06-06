@@ -10,7 +10,9 @@
 #define CAL_DATA_LENGTH 7
 #define CYCLES_PER_LASER 4
 #define PACKET_SIZE 1248
-
+#define LASERS_PER_BLOCK 32
+#define BLOCKS_PER_PACKET 12
+#define PACKET_HEADER_LENGTH 42
 
 //Calibration data for a laser
 struct laser_params {
@@ -28,11 +30,22 @@ struct laser_params {
 	u_char max_intensity;
 };
 
-//Last 6 bytes of a packet
-struct last_6_bytes{
-	u_char gpsT[4];
-	u_char statusType;
-	u_char statusVal;
+struct l_status{
+	u_char type;
+	u_char value;
+};
+
+struct laser_point{
+	u_short distance;
+	u_char intensity;
+};
+
+//Represents data extracted for a single laser block,
+// which has 32 lasers
+struct laser_block{
+	u_short laser_block_id;
+	u_short rotational_pos;
+	laser_point laserData[LASERS_PER_BLOCK];
 };
 
 #endif

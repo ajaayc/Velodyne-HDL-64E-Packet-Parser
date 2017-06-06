@@ -96,8 +96,9 @@ int main(int argc, char *argv[])
 
 	calibrationTableOutput table_calib("calibration_table.csv");
 
-	//Create output file to show a packet
+	laserOutput laser_out("laser_packets.csv");
 
+	int count = 1;
 	while (returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
 	{
 		// Print using printf. See printf reference:
@@ -134,11 +135,16 @@ int main(int argc, char *argv[])
 
 		lidarPacket pack(data);
 
+		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
 			cal_all.printCalibrationData(pack);
 			cal_calib.printCalibrationData(pack);
 			table_calib.recordNewPacket(pack);
+			if (count <= 10){
+				laser_out.printLaserData(pack);
+			}
 		}
+		++count;
 
 	}
 

@@ -7,11 +7,6 @@
 #include "packetOutput.h"
 #include "definitions.h"
 
-struct l_status{
-	u_char type;
-	u_char value;
-};
-
 //Class that stores calibration data by reading packets one after another.
 class calibrationTableOutput : public packetOutput {
 private:
