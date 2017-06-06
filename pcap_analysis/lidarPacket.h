@@ -4,12 +4,12 @@
 #include "pcap.h"
 
 class lidarPacket{
+private:
+	const u_char* data;
 public:
 	u_char gpsT[4];
 	u_char statusType;
 	u_char statusVal;
-
-	const u_char* data;
 
 	//Requires that data points to the beginning of a 1248 byte valid array
 	lidarPacket(const u_char *data) {

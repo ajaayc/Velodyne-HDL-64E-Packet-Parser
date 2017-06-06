@@ -7,8 +7,8 @@ www.youtube.com/watch?v=YpnrR7D_lRI
 */
 
 /* Demonstration program of reading packet trace files recorded by pcap
-* (used by tshark and tcpdump) and dumping out some corresponding information
-* in a human-readable form.
+* (used by tshark and tcpdump) for the Velodyne HDL-64E S2 Lidar and dumping
+* out some corresponding information in a human-readable form.
 *
 
 /*
