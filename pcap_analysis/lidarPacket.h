@@ -22,7 +22,7 @@ public:
 	void extractLaserReadings(const u_char *data){
 		//Loop through 12 blocks of 100 byte data
 		for (int block_no = 0; block_no < BLOCKS_PER_PACKET; ++block_no){
-			int block_start = PACKET_HEADER_LENGTH + sizeof(laser_block) * block_no;
+			int block_start = PACKET_HEADER_LENGTH + LASER_BLOCK_SIZE * block_no;
 			
 			laser_block& curr_block = blocks[block_no];
 			memcpy(&curr_block.laser_block_id, data + block_start, sizeof(curr_block.laser_block_id));
@@ -33,7 +33,7 @@ public:
 			//Now loop through all laser readings in this block
 			for (int laser_index = 0; laser_index < LASERS_PER_BLOCK; ++laser_index){
 				//offset in data array of current laser we're looking at
-				int curr_laser_offset = laser_start + laser_index * sizeof(laser_point);
+				int curr_laser_offset = laser_start + laser_index * LASER_POINT_SIZE;
 
 				//Now insert data into curr_block's laserData array
 				laser_point& curr_point = curr_block.laserData[laser_index];
@@ -47,7 +47,6 @@ public:
 
 	}
 
-	//TODO: Extract laser readings, too, if necessary
 	void extractCalibrationData(const u_char *data){
 		gpsT[0] = data[1242];
 		gpsT[1] = data[1243];

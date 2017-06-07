@@ -26,7 +26,7 @@ public:
 			//Print all laser data for this block
 			for (int j = 0; j < LASERS_PER_BLOCK; ++j){
 				const laser_point& curr_laser = curr_block.laserData[j];
-				fprintf(pktFile, "Laser Index,%u\n", j);
+				fprintf(pktFile, "Laser Index,%u\n", (curr_block.laser_block_id == 0xDDFF ? j : j + LASERS_PER_BLOCK));
 				fprintf(pktFile, "cm Distance,%f\n", curr_laser.distance * 2 / 10.0);
 				fprintf(pktFile, "Laser Intensity,%u\n", curr_laser.intensity);
 			}
