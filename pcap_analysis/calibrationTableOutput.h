@@ -68,6 +68,23 @@ public:
 
 		memset((void*)params, 0, sizeof(laser_params)* NUM_LASERS);
 	}
+
+	//Returns a pointer to the calibration data. Returns nullptr if calibration failed
+	//or calibration isn't done yet
+	//Caller is responsible for freeing memory.
+	const laser_params* getCalibrationData(){
+		if (!finishedCalibration || calibrationFail){
+			return nullptr;
+		}
+
+		//Returning a copy of the member variable to avoid scope issues
+		laser_params* copy = new laser_params[NUM_LASERS];
+
+		memcpy(copy, params, sizeof(laser_params) * NUM_LASERS);
+
+		return copy;
+	}
+
 private:
 	inline int getLaserIndex(int cycle_num, int index){
 		return cycle_num * CYCLE_LENGTH + MISC_DATA_LENGTH + index;
@@ -110,7 +127,7 @@ private:
 	}
 
 	//Puts values into laser_params[laserIndex] from currLaser
-	void parseLaserData(){
+	bool parseLaserData(){
 		laser_params& currParam = params[laserIndex];
 
 		currParam.laser_num = currLaser[getLaserIndex(0,0)].value;
@@ -136,7 +153,9 @@ private:
 			calibrationFail = true;
 			fprintf(pktFile, "ERROR: Calibration data no longer aligned at laser index %d.\n", laserIndex);
 			fprintf(pktFile, "It's suggested that you try to calibrate with a different pcap file.\n");
+			return false;
 		}
+		return true;
 	}
 
 public:
@@ -144,9 +163,15 @@ public:
 	//packets. (The caller must give every packet that it receives
 	//to this function without skipping)
 	//Packptr won't be recorded if we already have calibration data
-	void recordNewPacket(const lidarPacket& packptr){
-		if (finishedCalibration || calibrationFail){
-			return;
+	//Returns 0 if calibration complete, -1 if calibration failed, or + value
+	//if still need more data to calibrate
+	int recordNewPacket(const lidarPacket& packptr){
+		if (finishedCalibration){
+			return 0;
+		}
+
+		if (calibrationFail){
+			return -1;
 		}
 
 		if (!detectedUNIT) {
@@ -181,18 +206,21 @@ public:
 		//Finished calibration data for this laser
 		if (currIndex >= PACKETS_PER_LASER) {
 			//Puts values into laser_params[laserIndex] from currLaser
-			parseLaserData();
+			bool success = parseLaserData();
+			if (!success){
+				return -1;
+			}
+			
 			++laserIndex;
 			currIndex = 0;
+			
 
 			if (laserIndex >= NUM_LASERS) {
 				finishedCalibration = true;
-				/*
-				detectedUNIT = false;
-				laserIndex = 0;
-				*/
+				return 0;
 			}
 		}
+		return 1;
 	}
 
 

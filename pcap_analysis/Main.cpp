@@ -23,6 +23,7 @@ www.youtube.com/watch?v=YpnrR7D_lRI
 #include "laserOutput.h"
 #include "calibrationTableOutput.h"
 #include "lidarPacket.h"
+#include "modules.h"
 
 using namespace std;
 
@@ -41,7 +42,24 @@ int main(int argc, char *argv[])
 	//This file has calibration data for all 64 lasers
 	string file = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\veloview_parkinglot_recordings_5.23.17\\parking_lot_2.pcap";
 
+	//Calibrates the lidar by reading a pcap file
+	//Size of this array is NUM_LASERS
+	const laser_params* calTable = calibrateLidar(file);
+	if (calTable == nullptr){
+		printf("Error in calibration. See csv table output for more info.");
+		system("pause");
+		exit(1);
+	}
+
+	//Copy from heap to stack since heap isn't necessary anymore
+	laser_params params[NUM_LASERS];
+	memcpy(params,calTable, sizeof(laser_params) * NUM_LASERS);
+	delete[] calTable;
+	calTable = 0;
+
 	/*
+
+
 	* Step 3 - Create an char array to hold the error.
 	*/
 
@@ -88,15 +106,7 @@ int main(int argc, char *argv[])
 
 	int returnValue;
 
-	//Create calibration output file. This is for all data
-	calibrationRowOutput cal_all("calibration_all.csv",false);
-
-	//Create calibration output file. This is for only the 7 bytes
-	calibrationRowOutput cal_calib("calibration_only.csv", true);
-
-	calibrationTableOutput table_calib("calibration_table.csv");
-
-	laserOutput laser_out("laser_packets.csv");
+	laserOutput laser_out("laser_packets.csv",params);
 
 	int count = 1;
 	while (returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
@@ -137,9 +147,6 @@ int main(int argc, char *argv[])
 
 		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
-			cal_all.printCalibrationData(pack);
-			cal_calib.printCalibrationData(pack);
-			table_calib.recordNewPacket(pack);
 			if (count <= 10){
 				laser_out.printLaserData(pack);
 			}
@@ -147,5 +154,6 @@ int main(int argc, char *argv[])
 		++count;
 
 	}
+
 
 }

@@ -7,9 +7,11 @@
 
 class laserOutput : public packetOutput{
 private:
+	//Size of this array must be NUM_LASERS
+	const laser_params* params;
 	u_int packetID;
 public:
-	laserOutput(string outFile) : packetOutput(outFile),packetID(0) {
+	laserOutput(string outFile,laser_params* params) : packetOutput(outFile),packetID(0),params(params) {
 	}
 
 	//Takes in a pointer to beginning of the packet. Requires
