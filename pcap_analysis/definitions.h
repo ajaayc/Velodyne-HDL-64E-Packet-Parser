@@ -21,8 +21,8 @@
 
 #define PI 3.1415926535
 
-#define D2R(x) (x * PI / 180.0)
-#define R2D(x) (x * 180.0 / PI)
+#define D2R(x) ((x) * PI / 180.0)
+#define R2D(x) ((x) * 180.0 / PI)
 
 //Calibration data for a laser
 struct laser_params {

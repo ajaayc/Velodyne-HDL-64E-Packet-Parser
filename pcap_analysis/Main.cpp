@@ -73,10 +73,11 @@ int main(int argc, char *argv[])
 	*/
 
 	string analysisFile = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\calibration_5.24.17\\one_meter_enclosure_6.12.17.pcap";
+	//string analysisFile = "C:\\Users\Ajaay\\Documents\\UMTRI\\veloview\\veloview_parkinglot_recordings_5.23.17\\parking_lot_5.23.17.pcap";
 
 	// Use pcap_open_offline
 	// http://www.winpcap.org/docs/docs_41b5/html/group__wpcapfunc.html#g91078168a13de8848df2b7b83d1f5b69
-	pcap_t * pcap = pcap_open_offline(calibrationFile.c_str(), errbuff);
+	pcap_t * pcap = pcap_open_offline(analysisFile.c_str(), errbuff);
 	
 	if (pcap == nullptr || pcap == 0) {
 		printf("Couldn't open pcap file.\n");
@@ -108,7 +109,12 @@ int main(int argc, char *argv[])
 
 	int returnValue;
 
-	laserOutput laser_out("laser_packets.csv",params);
+	laserOutput laser_out_withPackets("C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\point_visualizer\\laser_packets.csv",params,true);
+	laserOutput laser_out_withoutPackets("C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\point_visualizer\\laser_no_packets.csv", params, false);
+
+	//Same contents as previous variables. Just made them to make a copy of the files in the visual studio directory
+	laserOutput laser_out_withPackets2("laser_packets.csv", params, true);
+	laserOutput laser_out_withoutPackets2("laser_no_packets.csv", params, false);
 
 	int count = 1;
 	while (returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
@@ -149,8 +155,12 @@ int main(int argc, char *argv[])
 
 		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
-			if (1000 <= count && count <= 1600 && count % 20 ==0){
-				laser_out.printLaserData(pack,count);
+			if (100 <= count && count <= 1125){
+				laser_out_withPackets.printLaserData(pack,count);
+				laser_out_withoutPackets.printLaserData(pack,count);
+
+				laser_out_withPackets2.printLaserData(pack, count);
+				laser_out_withoutPackets2.printLaserData(pack, count);
 			}
 		}
 		++count;
