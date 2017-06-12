@@ -1,7 +1,6 @@
 #ifndef _MODULES_H_
 #define _MODULES_H_
 
-#include "definitions.h"
 #include "calibrationTableOutput.h"
 #include "calibrationRowOutput.h"
 
