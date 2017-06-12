@@ -40,11 +40,11 @@ int main(int argc, char *argv[])
 	//string file = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\calibration_5.24.17\\calibration_packets.pcap";
 
 	//This file has calibration data for all 64 lasers
-	string file = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\veloview_parkinglot_recordings_5.23.17\\parking_lot_2.pcap";
+	string calibrationFile = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\veloview_parkinglot_recordings_5.23.17\\parking_lot_2.pcap";
 
 	//Calibrates the lidar by reading a pcap file
 	//Size of this array is NUM_LASERS
-	const laser_params* calTable = calibrateLidar(file);
+	const laser_params* calTable = calibrateLidar(calibrationFile);
 	if (calTable == nullptr){
 		printf("Error in calibration. See csv table output for more info.");
 		system("pause");
@@ -72,9 +72,11 @@ int main(int argc, char *argv[])
 	* Step 4 - Open the file and store result in pointer to pcap_t
 	*/
 
+	string analysisFile = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\calibration_5.24.17\\one_meter_enclosure_6.12.17.pcap";
+
 	// Use pcap_open_offline
 	// http://www.winpcap.org/docs/docs_41b5/html/group__wpcapfunc.html#g91078168a13de8848df2b7b83d1f5b69
-	pcap_t * pcap = pcap_open_offline(file.c_str(), errbuff);
+	pcap_t * pcap = pcap_open_offline(calibrationFile.c_str(), errbuff);
 	
 	if (pcap == nullptr || pcap == 0) {
 		printf("Couldn't open pcap file.\n");
@@ -147,8 +149,8 @@ int main(int argc, char *argv[])
 
 		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
-			if (count <= 10){
-				laser_out.printLaserData(pack);
+			if (1000 <= count && count <= 1600 && count % 20 ==0){
+				laser_out.printLaserData(pack,count);
 			}
 		}
 		++count;
