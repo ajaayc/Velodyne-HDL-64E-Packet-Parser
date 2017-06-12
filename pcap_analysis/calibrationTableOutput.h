@@ -112,17 +112,17 @@ private:
 
 	void printLaserData(const laser_params& param){
 	  fprintf(pktFile,"laser_num: %d\n",param.laser_num);
-	  fprintf(pktFile,"vert_correction: %f\n",param.vert_correction/100.0);
-	  fprintf(pktFile,"rot_correction: %f\n", param.rot_correction/100.0);
-	  fprintf(pktFile,"far_dist_correction: %f\n",param.far_dist_correction/10.0);
-	  fprintf(pktFile, "dist_correction_x: %f\n", param.dist_correction_x/10.0);
-	  fprintf(pktFile, "dist_correction_v: %f\n", param.dist_correction_v/10.0);
-	  fprintf(pktFile, "vert_offset_correction: %f\n", param.vert_offset_correction/10.0);
-	  fprintf(pktFile, "horiz_offset_correction: %f\n", param.horiz_offset_correction/10.0);
-	  fprintf(pktFile, "focal_dist: %f\n", param.focal_dist/10.0);
-	  fprintf(pktFile, "focal_slope: %f\n", param.focal_slope/10.0);
-	  fprintf(pktFile,"min_intensity: %u\n",param.min_intensity);
-	  fprintf(pktFile,"max_intensity: %u\n",param.max_intensity);
+	  fprintf(pktFile,"vert_correction: %f\n",param.computeVertCorrection());
+	  fprintf(pktFile,"rot_correction: %f\n", param.computeRotCorrection());
+	  fprintf(pktFile,"far_dist_correction: %f\n",param.computeDistCorr());
+	  fprintf(pktFile, "dist_correction_x: %f\n", param.computeDistCorrX());
+	  fprintf(pktFile, "dist_correction_v: %f\n", param.computeDistCorrY());
+	  fprintf(pktFile, "vert_offset_correction: %f\n", param.computeVertOffCorr());
+	  fprintf(pktFile, "horiz_offset_correction: %f\n", param.computeHorizOffCorr());
+	  fprintf(pktFile, "focal_dist: %f\n", param.computeFocDist());
+	  fprintf(pktFile, "focal_slope: %f\n", param.computeFocSlope());
+	  fprintf(pktFile,"min_intensity: %u\n",param.computeMinIntensity());
+	  fprintf(pktFile,"max_intensity: %u\n",param.computeMaxIntensity());
 	  fprintf(pktFile,"\n");
 	}
 

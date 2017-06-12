@@ -23,14 +23,14 @@ public:
 			const laser_block& curr_block = packptr.blocks[i];
 
 			fprintf(pktFile, "Laser Block ID,%.4X\n", curr_block.laser_block_id);
-			fprintf(pktFile, "Rotational Position,%f\n", curr_block.rotational_pos / 100.0);
+			fprintf(pktFile, "Rotational Position,%f\n", curr_block.computeRotation());
 			fprintf(pktFile, "Laser Index,cm Distance,Laser Intensity\n");
 			//Print all laser data for this block
 			for(int j = 0; j < LASERS_PER_BLOCK; ++j){
 				const laser_point& curr_laser = curr_block.laserData[j];
 				fprintf(pktFile, "%u,", (curr_block.laser_block_id == 0xDDFF ? j : j + LASERS_PER_BLOCK));
-				fprintf(pktFile, "%f,", curr_laser.distance * 2 / 10.0);
-				fprintf(pktFile, "%u\n", curr_laser.intensity);
+				fprintf(pktFile, "%f,", curr_laser.computeDist());
+				fprintf(pktFile, "%u\n", curr_laser.computeIntensity());
 			}
 			fprintf(pktFile, "--------------------------\n");
 		}
