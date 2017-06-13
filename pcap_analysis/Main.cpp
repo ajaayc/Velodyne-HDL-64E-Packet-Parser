@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
 	//Calibrates the lidar by reading a pcap file
 	//Size of this array is NUM_LASERS
-	const laser_params* calTable = calibrateLidar(calibrationFile);
+	const lidarLaser* calTable = calibrateLidar(calibrationFile);
 	if (calTable == nullptr){
 		printf("Error in calibration. See csv table output for more info.");
 		system("pause");
@@ -52,8 +52,8 @@ int main(int argc, char *argv[])
 	}
 
 	//Copy from heap to stack since heap isn't necessary anymore
-	laser_params params[NUM_LASERS];
-	memcpy(params,calTable, sizeof(laser_params) * NUM_LASERS);
+	lidarLaser params[NUM_LASERS];
+	memcpy(params,calTable, sizeof(lidarLaser) * NUM_LASERS);
 	delete[] calTable;
 	calTable = 0;
 

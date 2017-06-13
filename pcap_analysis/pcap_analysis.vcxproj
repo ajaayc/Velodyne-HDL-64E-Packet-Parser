@@ -88,6 +88,7 @@
     <ClInclude Include="calibrationRowOutput.h" />
     <ClInclude Include="calibrationTableOutput.h" />
     <ClInclude Include="laserOutput.h" />
+    <ClInclude Include="lidarLaser.h" />
     <ClInclude Include="lidarPacket.h" />
     <ClInclude Include="modules.h" />
     <ClInclude Include="packetOutput.h" />

@@ -13,9 +13,9 @@ private:
 	//2 Byte threshold
 	u_short threshold;
 	// NUM_LASERS should be 64.
-	laser_params params[NUM_LASERS];
+	lidarLaser params[NUM_LASERS];
 
-	//Current index of laser_params array
+	//Current index of lidarLaser array
 	int laserIndex;
 
 	//Current laser we've got data for
@@ -66,21 +66,21 @@ public:
 
 		memset((void*)currLaser, 0, sizeof(l_status)* PACKETS_PER_LASER);
 
-		memset((void*)params, 0, sizeof(laser_params)* NUM_LASERS);
+		memset((void*)params, 0, sizeof(lidarLaser)* NUM_LASERS);
 	}
 
 	//Returns a pointer to the calibration data. Returns nullptr if calibration failed
 	//or calibration isn't done yet
 	//Caller is responsible for freeing memory.
-	const laser_params* getCalibrationData(){
+	const lidarLaser* getCalibrationData(){
 		if (!finishedCalibration || calibrationFail){
 			return nullptr;
 		}
 
 		//Returning a copy of the member variable to avoid scope issues
-		laser_params* copy = new laser_params[NUM_LASERS];
+		lidarLaser* copy = new lidarLaser[NUM_LASERS];
 
-		memcpy(copy, params, sizeof(laser_params) * NUM_LASERS);
+		memcpy(copy, params, sizeof(lidarLaser) * NUM_LASERS);
 
 		return copy;
 	}
@@ -91,8 +91,8 @@ private:
 	}
 
 	/*
-	// Divides laser_params accordingly based on the manual
-	void scaleLaserData(laser_params& params){
+	// Divides lidarLaser accordingly based on the manual
+	void scaleLaserData(lidarLaser& params){
 		//Scale
 		params.vert_correction /= 100;
 		params.rot_correction /= 100;
@@ -110,7 +110,7 @@ private:
 	}
 	*/
 
-	void printLaserData(const laser_params& param){
+	void printLaserData(const lidarLaser& param){
 	  fprintf(pktFile,"laser_num: %d\n",param.laser_num);
 	  fprintf(pktFile,"vert_correction: %f\n",param.computeVertCorrection());
 	  fprintf(pktFile,"rot_correction: %f\n", param.computeRotCorrection());
@@ -126,9 +126,9 @@ private:
 	  fprintf(pktFile,"\n");
 	}
 
-	//Puts values into laser_params[laserIndex] from currLaser
+	//Puts values into lidarLaser[laserIndex] from currLaser
 	bool parseLaserData(){
-		laser_params& currParam = params[laserIndex];
+		lidarLaser& currParam = params[laserIndex];
 
 		currParam.laser_num = currLaser[getLaserIndex(0,0)].value;
 		currParam.vert_correction = bytes_to_short(getLaserIndex(0,1));
@@ -205,7 +205,7 @@ public:
 
 		//Finished calibration data for this laser
 		if (currIndex >= PACKETS_PER_LASER) {
-			//Puts values into laser_params[laserIndex] from currLaser
+			//Puts values into lidarLaser[laserIndex] from currLaser
 			bool success = parseLaserData();
 			if (!success){
 				return -1;

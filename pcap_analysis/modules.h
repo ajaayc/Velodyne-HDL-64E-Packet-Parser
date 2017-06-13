@@ -7,7 +7,7 @@
 // Builds a calibration table from the packets of a pcap file
 // The pointer returned by this function must be freed by the caller w/
 // delete []
-const laser_params* calibrateLidar(const string& calibrationFile){
+const lidarLaser* calibrateLidar(const string& calibrationFile){
 	char errbuff[PCAP_ERRBUF_SIZE];
 
 	// Use pcap_open_offline

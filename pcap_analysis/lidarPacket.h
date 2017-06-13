@@ -39,7 +39,7 @@ public:
 				laser_point& curr_point = curr_block.laserData[laser_index];
 
 				memcpy(&curr_point.distance, data+curr_laser_offset, sizeof(curr_point.distance));
-				curr_point.intensity = data[curr_laser_offset + 2];
+				curr_point.intensity = data[curr_laser_offset + sizeof(curr_point.distance)];
 			}
 
 

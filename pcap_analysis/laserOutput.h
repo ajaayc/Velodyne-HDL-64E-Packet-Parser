@@ -3,19 +3,20 @@
 
 #include <pcap.h>
 #include "packetOutput.h"
+#include "lidarLaser.h"
 #include <string>
 
 class laserOutput : public packetOutput{
 private:
 	//Size of this array must be NUM_LASERS
-	const laser_params* params;
+	const lidarLaser* params;
 
 	//If true, prints out packet numbers and blocks as well. If false,
 	//only prints a bunch of x,y,z,intensity rows, ignoring the packets. Note
 	//that the false case could cause several frames of data to be superimposed on each other
 	bool printPackets;
 public:
-	laserOutput(string outFile,laser_params* params,bool printPackets) : packetOutput(outFile),params(params),printPackets(printPackets) {
+	laserOutput(string outFile,lidarLaser* params,bool printPackets) : packetOutput(outFile),params(params),printPackets(printPackets) {
 		//Only print column heading once if not printing packets. This is for the python script
 		if (!printPackets){
 			fprintf(pktFile, "X,Y,Z,Laser Intensity\n");
@@ -51,8 +52,8 @@ public:
 				}
 
 				//Applying correction factors to laser
-				const laser_params& param = params[laser_id];
-				vector<double> xyz = curr_laser.computeXYZ(param,curr_block.computeRotation());
+				const lidarLaser& param = params[laser_id];
+				vector<double> xyz = param.computeXYZ(curr_laser,curr_block.computeRotation());
 
 				fprintf(pktFile, "%f,%f,%f,",xyz[0]/100.0,xyz[1]/100.0,xyz[2]/100.0);
 				fprintf(pktFile, "%u,", curr_laser.computeIntensity());
