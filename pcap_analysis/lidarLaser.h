@@ -30,7 +30,11 @@ public:
 	//Formulas obtained from paper by Naveed Muhammad and Simon Lacroix
 	//WARNING: Do not call this function until all of the calibration parameters have
 	//been initialized
-	vector<double> computeXYZ(const laser_point& point, double lidarAngle) const{
+
+	//If advanced calibration is true, use the algorithm from ROS-drivers, at
+	// https://github.com/ros-drivers/velodyne/blob/master/velodyne_pointcloud/src/lib/rawdata.cc, which incorporates
+	//distance_correction_x, distance_correction_y, focal distance, and focal slope
+	vector<double> computeXYZ(const laser_point& point, double lidarAngle,bool advancedCalibration) const{
 		double x, y, z;
 
 		double beta = D2R(lidarAngle - this->computeRotCorrection());
@@ -48,6 +52,12 @@ public:
 		xyz.push_back(y);
 		xyz.push_back(z);
 		return xyz;
+	}
+
+	//If advancedCalibration is true, uses the algorithm in the Velodyne manual to adjust intensity
+	//otherwise, just returns point.intensity
+	u_char computeIntensity(const laser_point& point, bool advancedCalibration) const{
+		return point.intensity;
 	}
 
 	//Returns in degrees

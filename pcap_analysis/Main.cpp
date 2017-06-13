@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 
 		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
-			if (100 <= count && count <= 1125){
+			if (800 <= count && count <= 1125){
 				laser_out_withPackets.printLaserData(pack,count);
 				laser_out_withoutPackets.printLaserData(pack,count);
 

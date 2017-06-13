@@ -41,22 +41,23 @@ public:
 
 			//Print all laser data for this block
 			for(int j = 0; j < LASERS_PER_BLOCK; ++j){
-				const laser_point& curr_laser = curr_block.laserData[j];
+				const laser_point& curr_reading = curr_block.laserData[j];
 				//TODO: Check that laser id is computed correctly
 				u_char laser_id = (curr_block.laser_block_id == 0xDDFF ? j : j + LASERS_PER_BLOCK);
 
 				//Also includes laser index and cm Distance
 				if (printPackets){
 					fprintf(pktFile, "%u,", laser_id);
-					fprintf(pktFile, "%f,", curr_laser.computeDist());
+					fprintf(pktFile, "%f,", curr_reading.computeDist());
 				}
 
 				//Applying correction factors to laser
-				const lidarLaser& param = params[laser_id];
-				vector<double> xyz = param.computeXYZ(curr_laser,curr_block.computeRotation());
+				const lidarLaser& curr_laser= params[laser_id];
+				vector<double> xyz = curr_laser.computeXYZ(curr_reading,curr_block.computeRotation(),false);
+				u_char intensity = curr_laser.computeIntensity(curr_reading, false);
 
 				fprintf(pktFile, "%f,%f,%f,",xyz[0]/100.0,xyz[1]/100.0,xyz[2]/100.0);
-				fprintf(pktFile, "%u,", curr_laser.computeIntensity());
+				fprintf(pktFile, "%u,", intensity);
 				fprintf(pktFile, "\n");
 			}
 			if (printPackets){
