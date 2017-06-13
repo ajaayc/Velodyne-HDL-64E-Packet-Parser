@@ -4,6 +4,10 @@
 #include "definitions.h"
 
 //Has calibration data for a laser
+//TODO: Make an abstract superclass with lidarLaser's data being private to protect them
+//from the class itself
+//TODO: If getter functions are too slow in dividing, then cache values
+//TODO: Make a constructor to encapsulate members for safety
 class lidarLaser {
 public:
 	//Made these public in order to allow memset
@@ -41,11 +45,35 @@ public:
 		double theta = D2R(this->computeVertCorrection());
 
 		double dist = point.computeDist() + this->computeDistCorr();
+
 		double dist_xy = dist * cos(theta) - this->computeVertOffCorr() * sin(theta);
 
 		x = dist_xy * sin(beta) - this->computeHorizOffCorr() * cos(beta);
 		y = dist_xy * cos(beta) + this->computeHorizOffCorr() * sin(beta);
-		z = dist * sin(theta) + this->computeVertOffCorr() * cos(theta);
+
+		double x_distance = dist, y_distance = dist;
+		if (advancedCalibration){
+			x = abs(x);
+			y = abs(y);
+
+			double dist_corr_x = 0, dist_corr_y = 0;
+			dist_corr_x = (this->computeDistCorr() - this->computeDistCorrX()) * (x - 2.4) / (25.04 - 2.4) + this->computeDistCorrX();
+			dist_corr_x -= this->computeDistCorr();
+
+			dist_corr_y = (this->computeDistCorr() - this->computeDistCorrY()) * (y - 1.93) / (25.04 - 1.93) + this->computeDistCorrY();
+			dist_corr_y -= this->computeDistCorr();
+
+			//Recompute distxy, x,y with these two calibration offsets
+			x_distance = point.computeDist() + dist_corr_x;
+			dist_xy = x_distance * cos(theta) - this->computeVertOffCorr() * sin(theta);
+			x = dist_xy * sin(beta) - this->computeHorizOffCorr() * cos(beta);
+
+			y_distance = point.computeDist() + dist_corr_y;
+			dist_xy = y_distance * cos(theta) - this->computeVertOffCorr() * sin(theta);
+			y = dist_xy * cos(beta) + this->computeHorizOffCorr() * sin(beta);
+		}
+
+		z = y_distance * sin(theta) + this->computeVertOffCorr() * cos(theta);
 
 		vector<double> xyz;
 		xyz.push_back(x);
@@ -57,7 +85,19 @@ public:
 	//If advancedCalibration is true, uses the algorithm in the Velodyne manual to adjust intensity
 	//otherwise, just returns point.intensity
 	u_char computeIntensity(const laser_point& point, bool advancedCalibration) const{
-		return point.intensity;
+		u_char intensity = point.computeIntensity();
+		if (advancedCalibration){
+			double focal_offset = 256 * pow(1 - this->computeFocDist()/13100.0,2);
+			intensity += this->computeFocSlope() * abs(focal_offset - 256 * pow(1 - point.computeDist()/65535.0,2));
+
+			auto min = this->computeMinIntensity();
+			auto max = this->computeMaxIntensity();
+
+			intensity = (intensity < min) ? min : intensity;
+			intensity = (intensity > max) ? max : intensity;
+		}
+
+		return intensity;
 	}
 
 	//Returns in degrees

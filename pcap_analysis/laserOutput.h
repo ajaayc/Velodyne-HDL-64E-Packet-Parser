@@ -51,10 +51,11 @@ public:
 					fprintf(pktFile, "%f,", curr_reading.computeDist());
 				}
 
-				//Applying correction factors to laser
+				//Applying correction factors to laser. It looks like the advanced calibration algorithm for xyz sucks. Would
+				//not recommend (unless my code has a bug)
 				const lidarLaser& curr_laser= params[laser_id];
 				vector<double> xyz = curr_laser.computeXYZ(curr_reading,curr_block.computeRotation(),false);
-				u_char intensity = curr_laser.computeIntensity(curr_reading, false);
+				u_char intensity = curr_laser.computeIntensity(curr_reading, true);
 
 				fprintf(pktFile, "%f,%f,%f,",xyz[0]/100.0,xyz[1]/100.0,xyz[2]/100.0);
 				fprintf(pktFile, "%u,", intensity);
