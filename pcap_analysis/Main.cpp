@@ -15,6 +15,7 @@ www.youtube.com/watch?v=YpnrR7D_lRI
 * Step 1 - Add includes
 */
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
@@ -109,12 +110,8 @@ int main(int argc, char *argv[])
 
 	int returnValue;
 
-	//laserOutput laser_out_withPackets("C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\point_visualizer\\laser_packets.csv",params,true,false);
-	//laserOutput laser_out_withoutPackets("C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\point_visualizer\\laser_no_packets.csv", params, false,true);
-
 	//Same contents as previous variables. Just made them to make a copy of the files in the visual studio directory
-	laserOutput laser_out_withPackets2("laser_packets.csv", params, true,false);
-	laserOutput laser_out_withoutPackets2("laser_no_packets.csv", params, false,false);
+	laserOutput laser_out2("laser_packets.csv", params, false,true);
 
 	int count = 1;
 	while (returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
@@ -155,17 +152,32 @@ int main(int argc, char *argv[])
 
 		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
-			if (800 <= count && count <= 1125){
-				//laser_out_withPackets.printLaserData(pack,count);
-				//laser_out_withoutPackets.printLaserData(pack,count);
+			//if (800 <= count && count <= 4000){
+				//laser_out.printLaserData(pack,count);
 
-				laser_out_withPackets2.printLaserData(pack, count);
-				laser_out_withoutPackets2.printLaserData(pack, count);
-			}
+				laser_out2.printLaserData(pack, count);
+			//}
 		}
 		++count;
 
 	}
 
+	auto framePair = laser_out2.getFrames();
+	const vector<lidarFrame>* frames = framePair.first;
+	int size = framePair.second;
+
+	printf("Total number of frames: %d\n",size);
+	printf("The number of packets read in is: %d\n", count);
+	system("pause");
+
+
+	//Make some output files
+	for (int i = 0; i < min(size,50); ++i){
+		stringstream f;
+		f << "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\python_point_visualizer\\";
+		f << "frame_" << i << ".csv";
+		frameOutput out(f.str(), &(frames->at(i)));
+		out.outputData();
+	}
 
 }

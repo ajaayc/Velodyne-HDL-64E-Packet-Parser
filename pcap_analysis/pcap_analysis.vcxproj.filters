@@ -44,5 +44,14 @@
     <ClInclude Include="lidarLaser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lidarPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lidarFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frameOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,8 +15,12 @@ public:
 		points.reserve(POINTS_PER_REV);
 	}
 
-	void addPoint(lidarPoint& p){
+	void addPoint(lidarPoint& p) {
 		points.push_back(p);
+	}
+
+	const vector<lidarPoint>* getPoints() const{
+		return &points;
 	}
 
 	//Renders frame in vtk?

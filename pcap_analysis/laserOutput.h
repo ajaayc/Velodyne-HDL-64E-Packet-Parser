@@ -6,6 +6,7 @@
 #include "lidarLaser.h"
 #include "lidarPoint.h"
 #include "lidarFrame.h"
+#include "frameOutput.h"
 #include <string>
 
 class laserOutput : public packetOutput{
@@ -26,9 +27,7 @@ private:
 	//Used to detect a new frame and increment currFrame
 	double prevAngle;
 
-	//If true, prints out packet numbers and blocks as well. If false,
-	//only prints a bunch of x,y,z,intensity rows, ignoring the packets. Note
-	//that the false case could cause several frames of data to be superimposed on each other
+	//If true, prints out packet numbers and blocks to an output file
 	bool printPackets;
 public:
 	laserOutput(string outFile, lidarLaser* params, bool printPackets, bool constructFrames) : constructFrames(constructFrames), currFrame(-1), prevAngle(-361), packetOutput(outFile), params(params), printPackets(printPackets) {
@@ -36,11 +35,11 @@ public:
 			//Reserve half a minutes worth of data to reduce recopying
 			frames.resize(300);
 		}
-
-		//Only print column heading once if not printing packets. This is for the python script
-		if (!printPackets){
-			fprintf(pktFile, "X,Y,Z,Laser Intensity\n");
-		}
+	}
+	
+	//Returns frame vector and its size. If currFrame is -1, then it's empty
+	std::pair<const vector<lidarFrame>*, int> getFrames(){
+		return std::make_pair(&frames,currFrame+1);
 	}
 
 	//Takes in a pointer to beginning of the packet. Requires
@@ -77,13 +76,17 @@ public:
 				vector<float> xyz = curr_laser.computeXYZ(curr_reading,curr_block.computeRotation(),false);
 				u_char intensity = curr_laser.computeIntensity(curr_reading, true);
 
-				fprintf(pktFile, "%f,%f,%f,",xyz[0]/100.0,xyz[1]/100.0,xyz[2]/100.0);
-				fprintf(pktFile, "%u,", intensity);
-				fprintf(pktFile, "\n");
+				if (printPackets){
+					fprintf(pktFile, "%f,%f,%f,", xyz[0] / 100.0, xyz[1] / 100.0, xyz[2] / 100.0);
+					fprintf(pktFile, "%u,", intensity);
+					fprintf(pktFile, "\n");
+				}
 
 				if (constructFrames){
 					//Storing data for frames
 					lidarPoint currPoint(xyz, intensity);
+					//Move to a new frame if completed a full rotation. This if statement also executes on the
+					//first iteration since prevAngle was set to -361
 					if (abs(curr_block.computeRotation() - prevAngle) >= 359){
 						++currFrame;
 						//Resize the vector if out of bounds
