@@ -18,6 +18,7 @@
 // to be larger than necessary
 #define LASER_POINT_SIZE 3
 #define LASER_BLOCK_SIZE 100 
+#define POINTS_PER_REV 133333
 
 #define PI 3.1415926535
 

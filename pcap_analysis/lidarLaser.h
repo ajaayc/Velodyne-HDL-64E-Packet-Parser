@@ -30,15 +30,15 @@ public:
 
 	//point represents a distance and intensity reading made by this laser. lidarAngle
 	//is the angle of the lidar at the time when this laser was emitted
-	//Returns a vector of size 3
+	//Returns a vector of size 3 floats (12 B total)
 	//Formulas obtained from paper by Naveed Muhammad and Simon Lacroix
 	//WARNING: Do not call this function until all of the calibration parameters have
 	//been initialized
 
 	//If advanced calibration is true, use the algorithm from ROS-drivers, at
 	// https://github.com/ros-drivers/velodyne/blob/master/velodyne_pointcloud/src/lib/rawdata.cc, which incorporates
-	//distance_correction_x, distance_correction_y, focal distance, and focal slope
-	vector<double> computeXYZ(const laser_point& point, double lidarAngle,bool advancedCalibration) const{
+	//distance_correction_x, distance_correction_y, focal distance, and focal slope.
+	vector<float> computeXYZ(const laser_point& point, double lidarAngle,bool advancedCalibration) const{
 		double x, y, z;
 
 		double beta = D2R(lidarAngle - this->computeRotCorrection());
@@ -75,10 +75,10 @@ public:
 
 		z = y_distance * sin(theta) + this->computeVertOffCorr() * cos(theta);
 
-		vector<double> xyz;
-		xyz.push_back(x);
-		xyz.push_back(y);
-		xyz.push_back(z);
+		vector<float> xyz;
+		xyz.push_back((float)x);
+		xyz.push_back((float)y);
+		xyz.push_back((float)z);
 		return xyz;
 	}
 
@@ -88,7 +88,8 @@ public:
 		u_char intensity = point.computeIntensity();
 		if (advancedCalibration){
 			double focal_offset = 256 * pow(1 - this->computeFocDist()/13100.0,2);
-			intensity += this->computeFocSlope() * abs(focal_offset - 256 * pow(1 - point.computeDist()/65535.0,2));
+			//TODO: Check what happens when you add an int to a u_char
+			intensity += static_cast<int>(this->computeFocSlope() * abs(focal_offset - 256 * pow(1 - point.computeDist()/65535.0,2)));
 
 			auto min = this->computeMinIntensity();
 			auto max = this->computeMaxIntensity();

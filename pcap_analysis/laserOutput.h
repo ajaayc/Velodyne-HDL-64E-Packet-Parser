@@ -4,19 +4,39 @@
 #include <pcap.h>
 #include "packetOutput.h"
 #include "lidarLaser.h"
+#include "lidarPoint.h"
+#include "lidarFrame.h"
 #include <string>
 
 class laserOutput : public packetOutput{
 private:
+	//True if user wants to also store frame objects from the packet output. Storing
+	//frame objects is expensive and this might not be necessary for all laser outputs
+	bool constructFrames;
+
 	//Size of this array must be NUM_LASERS
 	const lidarLaser* params;
+
+	//lidarFrame data for rendering purposes
+	vector<lidarFrame> frames;
+
+	//index of current frame in frames. Trying to avoid doing vector push_back to save time
+	int currFrame;
+
+	//Used to detect a new frame and increment currFrame
+	double prevAngle;
 
 	//If true, prints out packet numbers and blocks as well. If false,
 	//only prints a bunch of x,y,z,intensity rows, ignoring the packets. Note
 	//that the false case could cause several frames of data to be superimposed on each other
 	bool printPackets;
 public:
-	laserOutput(string outFile,lidarLaser* params,bool printPackets) : packetOutput(outFile),params(params),printPackets(printPackets) {
+	laserOutput(string outFile, lidarLaser* params, bool printPackets, bool constructFrames) : constructFrames(constructFrames), currFrame(-1), prevAngle(-361), packetOutput(outFile), params(params), printPackets(printPackets) {
+		if (constructFrames){
+			//Reserve half a minutes worth of data to reduce recopying
+			frames.resize(300);
+		}
+
 		//Only print column heading once if not printing packets. This is for the python script
 		if (!printPackets){
 			fprintf(pktFile, "X,Y,Z,Laser Intensity\n");
@@ -54,17 +74,36 @@ public:
 				//Applying correction factors to laser. It looks like the advanced calibration algorithm for xyz sucks. Would
 				//not recommend (unless my code has a bug)
 				const lidarLaser& curr_laser= params[laser_id];
-				vector<double> xyz = curr_laser.computeXYZ(curr_reading,curr_block.computeRotation(),false);
+				vector<float> xyz = curr_laser.computeXYZ(curr_reading,curr_block.computeRotation(),false);
 				u_char intensity = curr_laser.computeIntensity(curr_reading, true);
 
 				fprintf(pktFile, "%f,%f,%f,",xyz[0]/100.0,xyz[1]/100.0,xyz[2]/100.0);
 				fprintf(pktFile, "%u,", intensity);
 				fprintf(pktFile, "\n");
+
+				if (constructFrames){
+					//Storing data for frames
+					lidarPoint currPoint(xyz, intensity);
+					if (abs(curr_block.computeRotation() - prevAngle) >= 359){
+						++currFrame;
+						//Resize the vector if out of bounds
+						if (currFrame >= frames.size()){
+							frames.resize(frames.size() * 2);
+						}
+					}
+
+					//TODO: Could possibly optimize. prevAngle doesn't change for current block
+					prevAngle = curr_block.computeRotation();
+					//Append to currFrame
+					frames[currFrame].addPoint(currPoint);
+				}
+
 			}
 			if (printPackets){
 				fprintf(pktFile, "--------------------------\n");
 			}
 		}
+		void;
 	}
 
 	~laserOutput(){}

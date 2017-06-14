@@ -109,12 +109,12 @@ int main(int argc, char *argv[])
 
 	int returnValue;
 
-	laserOutput laser_out_withPackets("C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\point_visualizer\\laser_packets.csv",params,true);
-	laserOutput laser_out_withoutPackets("C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\point_visualizer\\laser_no_packets.csv", params, false);
+	//laserOutput laser_out_withPackets("C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\point_visualizer\\laser_packets.csv",params,true,false);
+	//laserOutput laser_out_withoutPackets("C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\point_visualizer\\laser_no_packets.csv", params, false,true);
 
 	//Same contents as previous variables. Just made them to make a copy of the files in the visual studio directory
-	laserOutput laser_out_withPackets2("laser_packets.csv", params, true);
-	laserOutput laser_out_withoutPackets2("laser_no_packets.csv", params, false);
+	laserOutput laser_out_withPackets2("laser_packets.csv", params, true,false);
+	laserOutput laser_out_withoutPackets2("laser_no_packets.csv", params, false,false);
 
 	int count = 1;
 	while (returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
@@ -156,8 +156,8 @@ int main(int argc, char *argv[])
 		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
 			if (800 <= count && count <= 1125){
-				laser_out_withPackets.printLaserData(pack,count);
-				laser_out_withoutPackets.printLaserData(pack,count);
+				//laser_out_withPackets.printLaserData(pack,count);
+				//laser_out_withoutPackets.printLaserData(pack,count);
 
 				laser_out_withPackets2.printLaserData(pack, count);
 				laser_out_withoutPackets2.printLaserData(pack, count);
