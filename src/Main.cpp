@@ -25,6 +25,7 @@ www.youtube.com/watch?v=YpnrR7D_lRI
 #include "calibrationTableOutput.h"
 #include "lidarPacket.h"
 #include "modules.h"
+#include "frameGUI.h"
 
 using namespace std;
 
@@ -54,7 +55,7 @@ int main(int argc, char *argv[])
 
 	//Copy from heap to stack since heap isn't necessary anymore
 	lidarLaser params[NUM_LASERS];
-	memcpy(params,calTable, sizeof(lidarLaser) * NUM_LASERS);
+	memcpy(params, calTable, sizeof(lidarLaser)* NUM_LASERS);
 	delete[] calTable;
 	calTable = 0;
 
@@ -79,7 +80,7 @@ int main(int argc, char *argv[])
 	// Use pcap_open_offline
 	// http://www.winpcap.org/docs/docs_41b5/html/group__wpcapfunc.html#g91078168a13de8848df2b7b83d1f5b69
 	pcap_t * pcap = pcap_open_offline(analysisFile.c_str(), errbuff);
-	
+
 	if (pcap == nullptr || pcap == 0) {
 		printf("Couldn't open pcap file.\n");
 		printf("%.*s", PCAP_ERRBUF_SIZE, pcap);
@@ -111,7 +112,7 @@ int main(int argc, char *argv[])
 	int returnValue;
 
 	//Same contents as previous variables. Just made them to make a copy of the files in the visual studio directory
-	laserOutput laser_out2("laser_packets.csv", params, false,true);
+	laserOutput laser_out2("laser_packets.csv", params, false, true);
 
 	int count = 1;
 	while (returnValue = pcap_next_ex(pcap, &header, &data) >= 0)
@@ -128,7 +129,7 @@ int main(int argc, char *argv[])
 
 		// Show a warning if the length captured is different
 		if (header->len != header->caplen){
-			printf("Warning! Capture size different than packet size: %ld bytes\n", header->len);
+		printf("Warning! Capture size different than packet size: %ld bytes\n", header->len);
 		}
 		// Show Epoch Time
 		printf("Epoch Time: %d:%d seconds\n", header->ts.tv_sec, header->ts.tv_usec);
@@ -137,12 +138,12 @@ int main(int argc, char *argv[])
 		// We also have a function that does this similarly below: PrintData()
 		for (u_int i = 0; (i < header->caplen); i++)
 		{
-			// Start printing on the next after every 16 octets
-			if ((i % 16) == 0) printf("\n");
+		// Start printing on the next after every 16 octets
+		if ((i % 16) == 0) printf("\n");
 
-			// Print each octet as hex (x), make sure there is always two characters (.2).
-			printf("%.2x ", data[i]);
-		}			
+		// Print each octet as hex (x), make sure there is always two characters (.2).
+		printf("%.2x ", data[i]);
+		}
 
 		// Add two lines between packets
 		printf("\n\n");
@@ -152,11 +153,11 @@ int main(int argc, char *argv[])
 
 		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
-			//if (800 <= count && count <= 4000){
+			if (800 <= count && count <= 2000){
 				//laser_out.printLaserData(pack,count);
 
 				laser_out2.printLaserData(pack, count);
-			//}
+			}
 		}
 		++count;
 
@@ -166,18 +167,29 @@ int main(int argc, char *argv[])
 	const vector<lidarFrame>* frames = framePair.first;
 	int size = framePair.second;
 
-	printf("Total number of frames: %d\n",size);
+	printf("Total number of frames: %d\n", size);
 	printf("The number of packets read in is: %d\n", count);
-	system("pause");
+	//system("pause");
 
 
+	/*
 	//Make some output files
 	for (int i = 0; i < min(size,50); ++i){
-		stringstream f;
-		f << "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\python_point_visualizer\\";
-		f << "frame_" << i << ".csv";
-		frameOutput out(f.str(), &(frames->at(i)));
-		out.outputData();
+	stringstream f;
+	f << "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\python_point_visualizer\\";
+	f << "frame_" << i << ".csv";
+	frameOutput out(f.str(), &(frames->at(i)));
+	out.outputData();
 	}
+	*/
+	vector<frameGUI> x;
+	for (int f = 0; f < size; ++f){
+		frameGUI temp;
+		x.push_back(temp);
+		printf("Frame %d size: %d\n", f, frames->at(f).getPoints()->size());
+		x[f].renderFrame(frames->at(f));
+		printf("Displayed frame %d. Press enter\n", f);
+	}
+	printf("Continuing...\n");
 
 }
