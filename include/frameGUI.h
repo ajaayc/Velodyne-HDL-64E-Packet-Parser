@@ -12,6 +12,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkProperty.h>
+#include <vtkLookupTable.h>
 
 #include "lidarFrame.h"
 #include "lidarPoint.h"
@@ -21,19 +22,31 @@
 #define InsertNextTupleValue InsertNextTypedTuple
 #endif
 
+// Creating a lookup table to map 0-255 intensity value to a color
+// www.vtk.org/Wiki/VTK/Examples/Cxx/Utilities/ColorLookupTable
+
 //Custom class to display lidar frames
 class frameGUI{
+private:
+	//Maps number in range 0 to 1 to 0 to 255
+	u_char mapTo255(float in){
+		u_char ret = in * 255.0;
+		return ret;
+	}
 public:
   vtkSmartPointer<vtkPoints> points;
   vtkSmartPointer<vtkPolyData> pointsPolydata;
   vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter;
   vtkSmartPointer<vtkPolyData> polydata;
-  //vtkSmartPointer<vtkUnsignedCharArray> colors;
+  vtkSmartPointer<vtkUnsignedCharArray> colors;
   vtkSmartPointer<vtkPolyDataMapper> mapper;
   vtkSmartPointer<vtkActor> actor;
   vtkSmartPointer<vtkRenderer> renderer;
   vtkSmartPointer<vtkRenderWindow> renderWindow;
   vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
+
+  //Color lookup table
+  vtkSmartPointer<vtkLookupTable> lookupTable;
 
 	frameGUI(){}
 	~frameGUI(){
@@ -100,24 +113,42 @@ polydata =
 			vtkSmartPointer<vtkPolyData>::New();
 		polydata->ShallowCopy(vertexFilter->GetOutput());
 
-		/*
-		// Setup colors
-		unsigned char red[3] = { 255, 0, 0 };
-		unsigned char green[3] = { 0, 255, 0 };
-		unsigned char blue[3] = { 0, 0, 255 };
+		//---------------------------------------------------------
+		//Setup colors:
+		lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+		lookupTable->SetTableRange(0.0, 255.0);
+		// If you don't want to use the whole color range, you can use
+		// SetValueRange, SetHueRange, and SetSaturationRange
+		lookupTable->Build();
 
-colors =
+		colors =
 			vtkSmartPointer<vtkUnsignedCharArray>::New();
-
+		//Sets char array to have rgb values
 		colors->SetNumberOfComponents(3);
 		colors->SetName("Colors");
-		colors->InsertNextTupleValue(red);
-		colors->InsertNextTupleValue(green);
-		colors->InsertNextTupleValue(blue);
-		
 
+		//Add a color for each point based on its intensity. TODO: Put in previous loop
+		//to optimize on branch instructions
+
+		for (int i = 0; i < lpoints->size(); ++i){
+			u_char curr_intensity = lpoints->at(i).intensity;
+			double colord[3];
+			//Get the rgb values
+			lookupTable->GetColor(curr_intensity,colord);
+			//Halve the amount of memory used for color
+			float color[3];
+			color[0] = mapTo255(colord[0]);
+			color[1] = mapTo255(colord[1]);
+			color[2] = mapTo255(colord[2]);
+
+			colors->InsertNextTuple(color);
+		}
+
+		//---------------------------------------------------------
+
+		//Set up the colors
 		polydata->GetPointData()->SetScalars(colors);
-		*/
+		
 
 		// Visualization
 mapper =
@@ -152,7 +183,7 @@ renderWindowInteractor =
 			printf("problems");
 		}
 		printf("Rendered the frame\n");
-		//renderWindowInteractor->Start();
+		renderWindowInteractor->Start();
 	}
 
 

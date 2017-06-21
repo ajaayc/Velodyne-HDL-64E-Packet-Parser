@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 
 		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
-			if (true || 800 <= count && count <= 2800){
+			if (800 <= count && count <= 2800){
 				//laser_out.printLaserData(pack,count);
 
 				laser_out2.printLaserData(pack, count);
@@ -171,26 +171,20 @@ int main(int argc, char *argv[])
 	printf("The number of packets read in is: %d\n", count);
 	//system("pause");
 
-
-	/*
-	//Make some output files of points
-	for (int i = 0; i < min(size,50); ++i){
-	stringstream f;
-	f << "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\python_point_visualizer\\";
-	f << "frame_" << i << ".csv";
-	frameOutput out(f.str(), &(frames->at(i)));
-	out.outputData();
-	}
-	*/
-
+	//Display frames and make output files of data for each frame
 	for (int i = 0; i < min(size, 50); ++i){
 		frameGUI temp;
 		printf("Frame size: %d\n", frames->at(i).getPoints()->size());
 		temp.renderFrame(frames->at(i));
-		printf("Displayed frame. Press enter\n");
+		printf("Displayed frame %d.\n",i);
 
+		stringstream f;
+		f << "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\python_point_visualizer\\";
+		f << "frame_" << i << ".csv";
+		frameOutput out(f.str(), &(frames->at(i)));
+		out.outputData();
+		printf("Output frame data to %s.\n", f.str().c_str());
 		printf("Continuing...\n");
-
 	}
 
 	system("pause");
