@@ -33,6 +33,9 @@ private:
 
 	//Do not render the the initial frame increment because that moves currFrame from -1 to 0
 	bool startRendering;
+
+	//GUI to display points
+	frameGUI gui;
 public:
 	laserOutput(string outFile, lidarLaser* params, bool printPackets, bool constructFrames) : constructFrames(constructFrames), currFrame(-1), prevAngle(-361), packetOutput(outFile), params(params), printPackets(printPackets),startRendering(false) {
 		if (constructFrames){
@@ -95,9 +98,9 @@ public:
 						++currFrame;
 						if (startRendering){
 							//Output frame to file and render in VTK
-							frameGUI temp;
-							printf("Frame size: %d\n", frames.at(i).getPoints()->size());
-							temp.renderFrame(frames.at(i));
+							printf("Frame size: %d\n", frames.at(currFrame - 1).getPoints()->size());
+							gui.setPoints(frames.at(currFrame - 1));
+							gui.render();
 							printf("Displayed frame %d.\n", i);
 							/*
 							stringstream f;

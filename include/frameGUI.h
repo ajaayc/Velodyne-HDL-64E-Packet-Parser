@@ -36,7 +36,7 @@ private:
 		u_char ret = in * 255.0;
 		return ret;
 	}
-public:
+
   vtkSmartPointer<vtkPoints> points;
   vtkSmartPointer<vtkPolyData> pointsPolydata;
   vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter;
@@ -50,53 +50,10 @@ public:
 
   //Color lookup table
   vtkSmartPointer<vtkLookupTable> lookupTable;
-
-	frameGUI(){}
-	~frameGUI(){
-		//Causes segfault in vtkSmartPointer
-		/*
-		  points->Delete();
-		  pointsPolydata->Delete();
-		  vertexFilter->Delete();
-		  polydata->Delete();
-		  //colors->Delete();
-		  mapper->Delete();
-		  actor->Delete();
-		  renderWindow->Delete();
-		  renderer->Delete();
-		  renderWindowInteractor->Delete();
-	  */
-	}
-
-
-	void renderFrame(const lidarFrame& frame){
-		const vector<lidarPoint>* lpoints = frame.getPoints();
-
+public:
+	//Builds the VTK pipeline
+	frameGUI(){
 		points = vtkSmartPointer<vtkPoints>::New();
-
-		int count = lpoints->size();
-		int rval = points->Allocate(count);
-		if (rval == 1){
-			printf("Allocation Succeeded!\n");
-		}
-		if (rval == 0){
-			printf("Allocation Failed!\n");
-		}
-		//system("pause");
-
-		//Adding all the points to the gui
-		for (u_int i = 0; i < count; ++i){
-			const float* xyz = lpoints->at(i).xyz;
-
-			try{
-				points->InsertNextPoint(xyz);
-			}
-			catch (const exception& e){
-				void;
-				system("pause");
-				printf("hi");
-			}
-		}
 
 		pointsPolydata = vtkSmartPointer<vtkPolyData>::New();
 
@@ -127,28 +84,10 @@ public:
 		colors->SetNumberOfComponents(3);
 		colors->SetName("Colors");
 
-		//Add a color for each point based on its intensity. TODO: Put in previous loop
-		//to optimize on branch instructions
-
-		for (int i = 0; i < lpoints->size(); ++i){
-			u_char curr_intensity = lpoints->at(i).intensity;
-			double colord[3];
-			//Get the rgb values
-			lookupTable->GetColor(curr_intensity,colord);
-			//Halve the amount of memory used for color
-			float color[3];
-			color[0] = mapTo255(colord[0]);
-			color[1] = mapTo255(colord[1]);
-			color[2] = mapTo255(colord[2]);
-
-			colors->InsertNextTuple(color);
-		}
-
 		//---------------------------------------------------------
 
 		//Set up the colors
 		polydata->GetPointData()->SetScalars(colors);
-		
 
 		// Visualization
 		mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -164,15 +103,67 @@ public:
 
 		renderer = vtkSmartPointer<vtkRenderer>::New();
 		renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-		
+
 		//Width,height
-		renderWindow->SetSize(1200,600);
+		renderWindow->SetSize(1200, 600);
 		renderWindow->AddRenderer(renderer);
 		renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
 		renderWindowInteractor->SetRenderWindow(renderWindow);
 
 		renderer->AddActor(actor);
+	}
 
+	void setPoints(const lidarFrame& frame){
+		const vector<lidarPoint>* lpoints = frame.getPoints();
+
+		int count = lpoints->size();
+
+		int rval = points->Allocate(count);
+		if (rval == 1){
+			printf("Allocation Succeeded!\n");
+		}
+		if (rval == 0){
+			printf("Allocation Failed!\n");
+		}
+
+		//Reset points and colors
+		points->Reset();
+		colors->Initialize();
+
+		//Adding all the points to the gui
+		for (u_int i = 0; i < count; ++i){
+			const float* xyz = lpoints->at(i).xyz;
+
+			try{
+				points->InsertNextPoint(xyz);
+			}
+			catch (const exception& e){
+				void;
+				system("pause");
+				printf("hi");
+			}
+
+			u_char curr_intensity = lpoints->at(i).intensity;
+			double colord[3];
+			//Get the rgb values
+			lookupTable->GetColor(curr_intensity, colord);
+			//Halve the amount of memory used for color
+			float color[3];
+			color[0] = mapTo255(colord[0]);
+			color[1] = mapTo255(colord[1]);
+			color[2] = mapTo255(colord[2]);
+
+			colors->InsertNextTuple(color);
+		}
+
+		vertexFilter->Update();
+	}
+
+	void render(){
+
+		//Add a color for each point based on its intensity. TODO: Put in previous loop
+		//to optimize on branch instructions
+		//---------------------------------------------------------
 		printf("About to render the frame\n");
 		try{
 			renderWindow->Render();
@@ -181,9 +172,26 @@ public:
 			printf("problems");
 		}
 		printf("Rendered the frame\n");
+
+		//Uncomment this to be able to interact with the window
 		//renderWindowInteractor->Start();
 	}
 
+	~frameGUI(){
+		//Causes segfault in vtkSmartPointer if not commented out
+		/*
+		points->Delete();
+		pointsPolydata->Delete();
+		vertexFilter->Delete();
+		polydata->Delete();
+		//colors->Delete();
+		mapper->Delete();
+		actor->Delete();
+		renderWindow->Delete();
+		renderer->Delete();
+		renderWindowInteractor->Delete();
+		*/
+	}
 
 };
 
