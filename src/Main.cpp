@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 
 		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
-			if (800 <= count && count <= 2000){
+			if (true || 800 <= count && count <= 2800){
 				//laser_out.printLaserData(pack,count);
 
 				laser_out2.printLaserData(pack, count);
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 
 
 	/*
-	//Make some output files
+	//Make some output files of points
 	for (int i = 0; i < min(size,50); ++i){
 	stringstream f;
 	f << "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\python_point_visualizer\\";
@@ -182,12 +182,17 @@ int main(int argc, char *argv[])
 	out.outputData();
 	}
 	*/
-	frameGUI temp;
-	int f_num = size / 2;
-	printf("Frame size: %d\n",frames->at(f_num).getPoints()->size());
-	temp.renderFrame(frames->at(f_num));
-	printf("Displayed frame. Press enter\n");
 
-	printf("Continuing...\n");
+	for (int i = 0; i < min(size, 50); ++i){
+		frameGUI temp;
+		printf("Frame size: %d\n", frames->at(i).getPoints()->size());
+		temp.renderFrame(frames->at(i));
+		printf("Displayed frame. Press enter\n");
+
+		printf("Continuing...\n");
+
+	}
+
+	system("pause");
 
 }

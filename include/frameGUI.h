@@ -28,7 +28,7 @@ public:
   vtkSmartPointer<vtkPolyData> pointsPolydata;
   vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter;
   vtkSmartPointer<vtkPolyData> polydata;
-  vtkSmartPointer<vtkUnsignedCharArray> colors;
+  //vtkSmartPointer<vtkUnsignedCharArray> colors;
   vtkSmartPointer<vtkPolyDataMapper> mapper;
   vtkSmartPointer<vtkActor> actor;
   vtkSmartPointer<vtkRenderer> renderer;
@@ -37,16 +37,18 @@ public:
 
 	frameGUI(){}
 	~frameGUI(){
+		/*
 	  points->Delete();
 	  pointsPolydata->Delete();
 	  vertexFilter->Delete();
 	  polydata->Delete();
-	  colors->Delete();
+	  //colors->Delete();
 	  mapper->Delete();
 	  actor->Delete();
 	  renderWindow->Delete();
 	  renderer->Delete();
 	  renderWindowInteractor->Delete();
+	  */
 	}
 
 
@@ -98,6 +100,7 @@ polydata =
 			vtkSmartPointer<vtkPolyData>::New();
 		polydata->ShallowCopy(vertexFilter->GetOutput());
 
+		/*
 		// Setup colors
 		unsigned char red[3] = { 255, 0, 0 };
 		unsigned char green[3] = { 0, 255, 0 };
@@ -111,9 +114,10 @@ colors =
 		colors->InsertNextTupleValue(red);
 		colors->InsertNextTupleValue(green);
 		colors->InsertNextTupleValue(blue);
-
+		
 
 		polydata->GetPointData()->SetScalars(colors);
+		*/
 
 		// Visualization
 mapper =
