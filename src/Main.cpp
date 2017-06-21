@@ -182,14 +182,12 @@ int main(int argc, char *argv[])
 	out.outputData();
 	}
 	*/
-	vector<frameGUI> x;
-	for (int f = 0; f < size; ++f){
-		frameGUI temp;
-		x.push_back(temp);
-		printf("Frame %d size: %d\n", f, frames->at(f).getPoints()->size());
-		x[f].renderFrame(frames->at(f));
-		printf("Displayed frame %d. Press enter\n", f);
-	}
+	frameGUI temp;
+	int f_num = size / 2;
+	printf("Frame size: %d\n",frames->at(f_num).getPoints()->size());
+	temp.renderFrame(frames->at(f_num));
+	printf("Displayed frame. Press enter\n");
+
 	printf("Continuing...\n");
 
 }

@@ -24,20 +24,54 @@
 //Custom class to display lidar frames
 class frameGUI{
 public:
+  vtkSmartPointer<vtkPoints> points;
+  vtkSmartPointer<vtkPolyData> pointsPolydata;
+  vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter;
+  vtkSmartPointer<vtkPolyData> polydata;
+  vtkSmartPointer<vtkUnsignedCharArray> colors;
+  vtkSmartPointer<vtkPolyDataMapper> mapper;
+  vtkSmartPointer<vtkActor> actor;
+  vtkSmartPointer<vtkRenderer> renderer;
+  vtkSmartPointer<vtkRenderWindow> renderWindow;
+  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
+
 	frameGUI(){}
+	~frameGUI(){
+	  points->Delete();
+	  pointsPolydata->Delete();
+	  vertexFilter->Delete();
+	  polydata->Delete();
+	  colors->Delete();
+	  mapper->Delete();
+	  actor->Delete();
+	  renderWindow->Delete();
+	  renderer->Delete();
+	  renderWindowInteractor->Delete();
+	}
+
 
 	void renderFrame(const lidarFrame& frame){
 		const vector<lidarPoint>* lpoints = frame.getPoints();
 
-		vtkSmartPointer<vtkPoints> points =
+		points =
 			vtkSmartPointer<vtkPoints>::New();
 
+		int count = lpoints->size();
+		int rval = points->Allocate(count);
+		if (rval == 1){
+			printf("Allocation Succeeded!\n");
+		}
+		if (rval == 0){
+			printf("Allocation Failed!\n");
+		}
+		//system("pause");
+
 		//Adding all the points to the gui
-		for (u_int i = 0; i < 20000; ++i){
+		for (u_int i = 0; i < count; ++i){
 			const float* xyz = lpoints->at(i).xyz;
 
 			try{
-				points->InsertNextPoint(xyz[0], xyz[1], xyz[2]);
+				points->InsertNextPoint(xyz);
 			}
 			catch (const exception& e){
 				void;
@@ -46,12 +80,12 @@ public:
 			}
 		}
 
-		vtkSmartPointer<vtkPolyData> pointsPolydata =
+pointsPolydata =
 			vtkSmartPointer<vtkPolyData>::New();
 
 		pointsPolydata->SetPoints(points);
 
-		vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter =
+vertexFilter =
 			vtkSmartPointer<vtkVertexGlyphFilter>::New();
 #if VTK_MAJOR_VERSION <= 5
 		vertexFilter->SetInputConnection(pointsPolydata->GetProducerPort());
@@ -60,7 +94,7 @@ public:
 #endif
 		vertexFilter->Update();
 
-		vtkSmartPointer<vtkPolyData> polydata =
+polydata =
 			vtkSmartPointer<vtkPolyData>::New();
 		polydata->ShallowCopy(vertexFilter->GetOutput());
 
@@ -69,7 +103,7 @@ public:
 		unsigned char green[3] = { 0, 255, 0 };
 		unsigned char blue[3] = { 0, 0, 255 };
 
-		vtkSmartPointer<vtkUnsignedCharArray> colors =
+colors =
 			vtkSmartPointer<vtkUnsignedCharArray>::New();
 
 		colors->SetNumberOfComponents(3);
@@ -82,7 +116,7 @@ public:
 		polydata->GetPointData()->SetScalars(colors);
 
 		// Visualization
-		vtkSmartPointer<vtkPolyDataMapper> mapper =
+mapper =
 			vtkSmartPointer<vtkPolyDataMapper>::New();
 #if VTK_MAJOR_VERSION <= 5
 		mapper->SetInputConnection(polydata->GetProducerPort());
@@ -90,17 +124,17 @@ public:
 		mapper->SetInputData(polydata);
 #endif
 
-		vtkSmartPointer<vtkActor> actor =
+actor =
 			vtkSmartPointer<vtkActor>::New();
 		actor->SetMapper(mapper);
 		actor->GetProperty()->SetPointSize(5);
 
-		vtkSmartPointer<vtkRenderer> renderer =
+renderer =
 			vtkSmartPointer<vtkRenderer>::New();
-		vtkSmartPointer<vtkRenderWindow> renderWindow =
+renderWindow =
 			vtkSmartPointer<vtkRenderWindow>::New();
 		renderWindow->AddRenderer(renderer);
-		vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
+renderWindowInteractor =
 			vtkSmartPointer<vtkRenderWindowInteractor>::New();
 		renderWindowInteractor->SetRenderWindow(renderWindow);
 
