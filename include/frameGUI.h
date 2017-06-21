@@ -72,8 +72,7 @@ public:
 	void renderFrame(const lidarFrame& frame){
 		const vector<lidarPoint>* lpoints = frame.getPoints();
 
-		points =
-			vtkSmartPointer<vtkPoints>::New();
+		points = vtkSmartPointer<vtkPoints>::New();
 
 		int count = lpoints->size();
 		int rval = points->Allocate(count);
@@ -99,13 +98,11 @@ public:
 			}
 		}
 
-pointsPolydata =
-			vtkSmartPointer<vtkPolyData>::New();
+		pointsPolydata = vtkSmartPointer<vtkPolyData>::New();
 
 		pointsPolydata->SetPoints(points);
 
-vertexFilter =
-			vtkSmartPointer<vtkVertexGlyphFilter>::New();
+		vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
 #if VTK_MAJOR_VERSION <= 5
 		vertexFilter->SetInputConnection(pointsPolydata->GetProducerPort());
 #else
@@ -113,8 +110,7 @@ vertexFilter =
 #endif
 		vertexFilter->Update();
 
-polydata =
-			vtkSmartPointer<vtkPolyData>::New();
+		polydata = vtkSmartPointer<vtkPolyData>::New();
 		polydata->ShallowCopy(vertexFilter->GetOutput());
 
 		//---------------------------------------------------------
@@ -155,26 +151,24 @@ polydata =
 		
 
 		// Visualization
-mapper =
-			vtkSmartPointer<vtkPolyDataMapper>::New();
+		mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 #if VTK_MAJOR_VERSION <= 5
 		mapper->SetInputConnection(polydata->GetProducerPort());
 #else
 		mapper->SetInputData(polydata);
 #endif
 
-actor =
-			vtkSmartPointer<vtkActor>::New();
+		actor = vtkSmartPointer<vtkActor>::New();
 		actor->SetMapper(mapper);
-		actor->GetProperty()->SetPointSize(5);
+		actor->GetProperty()->SetPointSize(3);
 
-renderer =
-			vtkSmartPointer<vtkRenderer>::New();
-renderWindow =
-			vtkSmartPointer<vtkRenderWindow>::New();
+		renderer = vtkSmartPointer<vtkRenderer>::New();
+		renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+		
+		//Width,height
+		renderWindow->SetSize(1200,600);
 		renderWindow->AddRenderer(renderer);
-renderWindowInteractor =
-			vtkSmartPointer<vtkRenderWindowInteractor>::New();
+		renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
 		renderWindowInteractor->SetRenderWindow(renderWindow);
 
 		renderer->AddActor(actor);
