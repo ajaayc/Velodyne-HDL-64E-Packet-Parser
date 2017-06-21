@@ -1,3 +1,6 @@
+#ifndef _FRAME_GUI_H_
+#define _FRAME_GUI_H_
+
 #include <vtkVersion.h>
 #include <vtkSmartPointer.h>
 #include <vtkPoints.h>
@@ -50,17 +53,18 @@ public:
 
 	frameGUI(){}
 	~frameGUI(){
+		//Causes segfault in vtkSmartPointer
 		/*
-	  points->Delete();
-	  pointsPolydata->Delete();
-	  vertexFilter->Delete();
-	  polydata->Delete();
-	  //colors->Delete();
-	  mapper->Delete();
-	  actor->Delete();
-	  renderWindow->Delete();
-	  renderer->Delete();
-	  renderWindowInteractor->Delete();
+		  points->Delete();
+		  pointsPolydata->Delete();
+		  vertexFilter->Delete();
+		  polydata->Delete();
+		  //colors->Delete();
+		  mapper->Delete();
+		  actor->Delete();
+		  renderWindow->Delete();
+		  renderer->Delete();
+		  renderWindowInteractor->Delete();
 	  */
 	}
 
@@ -183,8 +187,10 @@ renderWindowInteractor =
 			printf("problems");
 		}
 		printf("Rendered the frame\n");
-		renderWindowInteractor->Start();
+		//renderWindowInteractor->Start();
 	}
 
 
 };
+
+#endif

@@ -7,6 +7,7 @@
 #include "lidarPoint.h"
 #include "lidarFrame.h"
 #include "frameOutput.h"
+#include "frameGUI.h"
 #include <string>
 
 class laserOutput : public packetOutput{
@@ -29,8 +30,11 @@ private:
 
 	//If true, prints out packet numbers and blocks to an output file
 	bool printPackets;
+
+	//Do not render the the initial frame increment because that moves currFrame from -1 to 0
+	bool startRendering;
 public:
-	laserOutput(string outFile, lidarLaser* params, bool printPackets, bool constructFrames) : constructFrames(constructFrames), currFrame(-1), prevAngle(-361), packetOutput(outFile), params(params), printPackets(printPackets) {
+	laserOutput(string outFile, lidarLaser* params, bool printPackets, bool constructFrames) : constructFrames(constructFrames), currFrame(-1), prevAngle(-361), packetOutput(outFile), params(params), printPackets(printPackets),startRendering(false) {
 		if (constructFrames){
 			//Reserve half a minutes worth of data to reduce recopying
 			frames.resize(300);
@@ -89,6 +93,24 @@ public:
 					//first iteration since prevAngle was set to -361
 					if (abs(curr_block.computeRotation() - prevAngle) >= 359){
 						++currFrame;
+						if (startRendering){
+							//Output frame to file and render in VTK
+							frameGUI temp;
+							printf("Frame size: %d\n", frames.at(i).getPoints()->size());
+							temp.renderFrame(frames.at(i));
+							printf("Displayed frame %d.\n", i);
+							/*
+							stringstream f;
+							f << "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\python_point_visualizer\\";
+							f << "frame_" << i << ".csv";
+							frameOutput out(f.str(), &(frames.at(i)));
+							out.outputData();
+							printf("Output frame data to %s.\n", f.str().c_str());
+							printf("Continuing...\n");
+							*/
+						}
+
+						startRendering = true;
 						//Resize the vector if out of bounds
 						if (currFrame >= frames.size()){
 							frames.resize(frames.size() * 2);

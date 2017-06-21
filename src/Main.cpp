@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 
 		//TODO: Use polymorphism if this gets crazy
 		if (header->caplen == PACKET_SIZE) {
-			if (800 <= count && count <= 2800){
+			if (800 <= count && count <= 10000){
 				//laser_out.printLaserData(pack,count);
 
 				laser_out2.printLaserData(pack, count);
@@ -171,6 +171,7 @@ int main(int argc, char *argv[])
 	printf("The number of packets read in is: %d\n", count);
 	//system("pause");
 
+	/*
 	//Display frames and make output files of data for each frame
 	for (int i = 0; i < min(size, 50); ++i){
 		frameGUI temp;
@@ -186,6 +187,7 @@ int main(int argc, char *argv[])
 		printf("Output frame data to %s.\n", f.str().c_str());
 		printf("Continuing...\n");
 	}
+	*/
 
 	system("pause");
 

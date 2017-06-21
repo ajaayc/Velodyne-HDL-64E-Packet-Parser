@@ -23,11 +23,6 @@ public:
 		return &points;
 	}
 
-	//Renders frame in vtk?
-	void render(){
-		return;
-	}
-
 };
 
 #endif
