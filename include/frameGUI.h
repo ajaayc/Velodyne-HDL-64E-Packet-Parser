@@ -37,19 +37,19 @@ private:
 		return ret;
 	}
 
-  vtkSmartPointer<vtkPoints> points;
-  vtkSmartPointer<vtkPolyData> pointsPolydata;
-  vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter;
-  vtkSmartPointer<vtkPolyData> polydata;
-  vtkSmartPointer<vtkUnsignedCharArray> colors;
-  vtkSmartPointer<vtkPolyDataMapper> mapper;
-  vtkSmartPointer<vtkActor> actor;
-  vtkSmartPointer<vtkRenderer> renderer;
-  vtkSmartPointer<vtkRenderWindow> renderWindow;
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
+	vtkSmartPointer<vtkPoints> points;
+	vtkSmartPointer<vtkPolyData> pointsPolydata;
+	vtkSmartPointer<vtkVertexGlyphFilter> vertexFilter;
+	vtkSmartPointer<vtkPolyData> polydata;
+	vtkSmartPointer<vtkUnsignedCharArray> colors;
+	vtkSmartPointer<vtkPolyDataMapper> mapper;
+	vtkSmartPointer<vtkActor> actor;
+	vtkSmartPointer<vtkRenderer> renderer;
+	vtkSmartPointer<vtkRenderWindow> renderWindow;
+	vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
 
-  //Color lookup table
-  vtkSmartPointer<vtkLookupTable> lookupTable;
+	//Color lookup table
+	vtkSmartPointer<vtkLookupTable> lookupTable;
 public:
 	//Builds the VTK pipeline
 	frameGUI(){
@@ -163,6 +163,10 @@ public:
 			colors->InsertNextTuple(color);
 		}
 
+		//pointsPolydata is an input to vertexFilter
+		pointsPolydata->SetPoints(points);
+		pointsPolydata->Modified();
+
 		//vertexFilter->Update();
 
 		/*
@@ -171,12 +175,21 @@ public:
 		mapper->Update();
 		*/
 
-		points->Modified();
-		pointsPolydata->Modified();
 		vertexFilter->Modified();
 		vertexFilter->Update();
-		polydata->Modified();
+
 		colors->Modified();
+
+		//This line is absolutely necessary
+		polydata->ShallowCopy(vertexFilter->GetOutput());
+		polydata->GetPointData()->SetScalars(colors);
+
+
+		points->Modified();
+		pointsPolydata->Modified();
+
+		polydata->Modified();
+
 		mapper->Modified();
 		mapper->Update();
 		actor->Modified();
