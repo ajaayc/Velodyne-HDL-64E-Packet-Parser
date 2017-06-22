@@ -111,12 +111,21 @@ public:
 		renderWindowInteractor->SetRenderWindow(renderWindow);
 
 		renderer->AddActor(actor);
+
+		//renderWindow->Render();
+		//Uncomment this to be able to interact with the window
+		//renderWindowInteractor->Start();
+		//renderWindowInteractor->Initialize();
 	}
 
 	void setPoints(const lidarFrame& frame){
 		const vector<lidarPoint>* lpoints = frame.getPoints();
 
 		int count = lpoints->size();
+
+		//Reset points and colors
+		points->Reset();
+		colors->Initialize();
 
 		int rval = points->Allocate(count);
 		if (rval == 1){
@@ -126,9 +135,7 @@ public:
 			printf("Allocation Failed!\n");
 		}
 
-		//Reset points and colors
-		points->Reset();
-		colors->Initialize();
+		colors->Allocate(count);
 
 		//Adding all the points to the gui
 		for (u_int i = 0; i < count; ++i){
@@ -156,7 +163,26 @@ public:
 			colors->InsertNextTuple(color);
 		}
 
+		//vertexFilter->Update();
+
+		/*
+		points->Modified();
+		mapper->Modified();
+		mapper->Update();
+		*/
+
+		points->Modified();
+		pointsPolydata->Modified();
+		vertexFilter->Modified();
 		vertexFilter->Update();
+		polydata->Modified();
+		colors->Modified();
+		mapper->Modified();
+		mapper->Update();
+		actor->Modified();
+		renderer->Modified();
+		renderWindow->Modified();
+		renderWindowInteractor->Modified();
 	}
 
 	void render(){
@@ -172,9 +198,7 @@ public:
 			printf("problems");
 		}
 		printf("Rendered the frame\n");
-
-		//Uncomment this to be able to interact with the window
-		//renderWindowInteractor->Start();
+		renderWindowInteractor->Start();
 	}
 
 	~frameGUI(){

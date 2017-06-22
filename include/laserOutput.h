@@ -98,10 +98,13 @@ public:
 						++currFrame;
 						if (startRendering){
 							//Output frame to file and render in VTK
-							printf("Frame size: %d\n", frames.at(currFrame - 1).getPoints()->size());
-							gui.setPoints(frames.at(currFrame - 1));
+							u_int targetFrame = currFrame - 1;
+
+							printf("Frame size: %d\n", frames.at(targetFrame).getPoints()->size());
+							gui.setPoints(frames.at(targetFrame));
 							gui.render();
-							printf("Displayed frame %d.\n", i);
+							printf("Displayed frame %d.\n", targetFrame);
+
 							/*
 							stringstream f;
 							f << "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\python_point_visualizer\\";
