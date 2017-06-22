@@ -75,7 +75,10 @@ int main(int argc, char *argv[])
 	*/
 
 	string analysisFile = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\calibration_5.24.17\\one_meter_enclosure_6.12.17.pcap";
-	//string analysisFile = "C:\\Users\Ajaay\\Documents\\UMTRI\\veloview\\veloview_parkinglot_recordings_5.23.17\\parking_lot_5.23.17.pcap";
+	//string analysisFile = "C:\\Users\\Ajaay\\Documents\\UMTRI\\veloview\\veloview_parkinglot_recordings_5.23.17\\parking_lot_5.23.17.pcap";
+
+	printf("%s\n", analysisFile.c_str());
+	//system("pause");
 
 	// Use pcap_open_offline
 	// http://www.winpcap.org/docs/docs_41b5/html/group__wpcapfunc.html#g91078168a13de8848df2b7b83d1f5b69

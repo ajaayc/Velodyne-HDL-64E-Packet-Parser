@@ -113,9 +113,16 @@ public:
 		renderer->AddActor(actor);
 
 		//renderWindow->Render();
-		//Uncomment this to be able to interact with the window
+		
+		//The Start function initiates an event loop for the GUI that blocks all execution.
+		//The event loop is what allows users to interact with the GUI as it updates because it
+		//is constantly woken up when a mouse event occurs.
+		//To allow user interaction and update the screen as the same time, we need a thread to
+		//run the event loop and another thread that updates the data to render in the screen.
+		//concurrently. Synchronization.
+
 		//renderWindowInteractor->Start();
-		//renderWindowInteractor->Initialize();
+		renderWindowInteractor->Initialize();
 	}
 
 	void setPoints(const lidarFrame& frame){
@@ -181,6 +188,7 @@ public:
 		colors->Modified();
 
 		//This line is absolutely necessary
+		//TODO: Try to change pipeline to remove this shallow copy. Might be causing speed issues.
 		polydata->ShallowCopy(vertexFilter->GetOutput());
 		polydata->GetPointData()->SetScalars(colors);
 
@@ -211,7 +219,7 @@ public:
 			printf("problems");
 		}
 		printf("Rendered the frame\n");
-		renderWindowInteractor->Start();
+		//renderWindowInteractor->Start();
 	}
 
 	~frameGUI(){
