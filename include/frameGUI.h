@@ -16,6 +16,7 @@
 #include <vtkVertexGlyphFilter.h>
 #include <vtkProperty.h>
 #include <vtkLookupTable.h>
+#include <vtkInteractorStyleTrackballCamera.h>
 
 #include "lidarFrame.h"
 #include "lidarPoint.h"
@@ -48,6 +49,8 @@ private:
 	vtkSmartPointer<vtkRenderWindow> renderWindow;
 	vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
 
+	//Trackball camer interactor
+	vtkSmartPointer<vtkInteractorStyleTrackballCamera> style;
 	//Color lookup table
 	vtkSmartPointer<vtkLookupTable> lookupTable;
 public:
@@ -120,6 +123,10 @@ public:
 		//To allow user interaction and update the screen as the same time, we need a thread to
 		//run the event loop and another thread that updates the data to render in the screen.
 		//concurrently. Synchronization.
+
+		style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New(); //like paraview
+
+		renderWindowInteractor->SetInteractorStyle(style);
 
 		//renderWindowInteractor->Start();
 		renderWindowInteractor->Initialize();
